@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/forum
+    username: root
+    password: root
+  jpa:
+    generate-ddl: true
+    show-sql: false
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 129547250063-97i5op9dpcmpmitpa11lcf4510ign4e9.apps.googleusercontent.com
+            clientSecret: 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
+            scope:
+              - email
+              - profile
+
+jwt:
+  cookieName: jwtToken
+  secret: JAr2PyCQA1j6gJd3Qe_K1Y9OcyzN9t6LtCdaJl06tfpwTKx7
+  expiration: 86400
+
+upload:
+  path: C:/Users/79523/Desktop/project/Forum/uploads
