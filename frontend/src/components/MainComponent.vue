@@ -36,6 +36,20 @@ export default {
   props: {
     msg: String
   }
+
+  // const formData = new FormData();
+  // formData.append('article', JSON.stringify(articleData)); // articleData - данные статьи в формате JSON
+  // images.forEach(image => formData.append('images', image)); // images - массив изображений
+  //
+  // axios.post('/articles', formData, {
+  //   headers: {
+  //     'Content-Type': 'multipart/form-data'
+  //   }
+  // }).then(response => {
+  //   // Обработка успешного ответа
+  // }).catch(error => {
+  //   // Обработка ошибки
+  // });
 }
 </script>
 

@@ -1,8 +1,6 @@
 package com.example.backend.exception.handler;
 
-import com.example.backend.exception.UserAlreadyExistsException;
-import com.example.backend.exception.UserAuthenticationException;
-import com.example.backend.exception.UserNotFoundException;
+import com.example.backend.exception.*;
 import com.example.backend.response.ResponseMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,8 +22,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(InvalidParameterException.class)
-    public ResponseEntity<?> handleInvalidParameterException(InvalidParameterException e) {
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleInvalidParameterException(IllegalArgumentException e) {
         LOGGER.warn("Invalid parameter passed. Message: " + e.getMessage());
         return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
@@ -39,6 +36,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException e) {
         return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ArticleNotFoundException.class)
+    public ResponseEntity<?> handleArticleNotFoundException(ArticleNotFoundException e) {
+        return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FileManagerException.class)
+    public ResponseEntity<?> handleFileManagerException(FileManagerException e) {
+        LOGGER.error("Error in the file system. Message: " + e.getMessage());
+        return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

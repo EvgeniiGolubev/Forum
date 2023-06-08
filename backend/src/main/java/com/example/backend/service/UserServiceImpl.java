@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidParameterException;
 import java.util.Collections;
 
 @Service
@@ -29,9 +28,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User saveUser(NewUserDto newUserDto) throws InvalidParameterException {
+    public User saveUser(NewUserDto newUserDto) throws IllegalArgumentException {
         if (newUserDto == null) {
-            throw new InvalidParameterException("New user can not be null");
+            throw new IllegalArgumentException("New user can not be null");
         }
 
         User user = new User(
@@ -49,18 +48,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserFromUserDetails(UserDetailsImpl authenticatedUser) throws InvalidParameterException {
+    public User getUserFromUserDetails(UserDetailsImpl authenticatedUser) throws IllegalArgumentException {
         if (authenticatedUser == null) {
-            throw new InvalidParameterException("Authenticated user can not be null");
+            throw new IllegalArgumentException("Authenticated user can not be null");
         }
 
         return userRepository.findByEmail(authenticatedUser.getUsername());
     }
 
     @Override
-    public User findUserById(Long id) throws InvalidParameterException, UserNotFoundException {
+    public User findUserById(Long id) throws IllegalArgumentException, UserNotFoundException {
         if (id == null) {
-            throw new InvalidParameterException("Id can not be null");
+            throw new IllegalArgumentException("Id can not be null");
         }
 
         User user = userRepository.findById(id).orElse(null);
@@ -73,18 +72,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) throws InvalidParameterException {
+    public User updateUser(User user) throws IllegalArgumentException {
         if (user == null) {
-            throw new InvalidParameterException("Updated user can not be null");
+            throw new IllegalArgumentException("Updated user can not be null");
         }
 
         return userRepository.save(user);
     }
 
     @Override
-    public void checkEmailExists(String email) throws UserAlreadyExistsException, InvalidParameterException {
+    public void checkEmailExists(String email) throws IllegalArgumentException, UserAlreadyExistsException {
         if (email == null) {
-            throw new InvalidParameterException("Email can not be null");
+            throw new IllegalArgumentException("Email can not be null");
         }
 
         if (userRepository.findByEmail(email) != null) {
@@ -93,9 +92,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void checkNameExists(String name) throws UserAlreadyExistsException, InvalidParameterException {
+    public void checkNameExists(String name) throws IllegalArgumentException, UserAlreadyExistsException {
         if (name == null) {
-            throw new InvalidParameterException("Name can not be null");
+            throw new IllegalArgumentException("Name can not be null");
         }
 
         if (userRepository.findByName(name) != null) {
@@ -104,9 +103,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserDtoByEmail(String email) throws UserNotFoundException, InvalidParameterException {
+    public UserDto getUserDtoByEmail(String email) throws IllegalArgumentException, UserNotFoundException {
         if (email == null) {
-            throw new InvalidParameterException("Email can not be null");
+            throw new IllegalArgumentException("Email can not be null");
         }
         User user = userRepository.findByEmail(email);
 

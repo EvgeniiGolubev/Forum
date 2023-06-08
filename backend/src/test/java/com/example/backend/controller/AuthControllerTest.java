@@ -1,11 +1,9 @@
 package com.example.backend.controller;
 
-import com.example.backend.exception.UserAlreadyExistsException;
 import com.example.backend.exception.UserAuthenticationException;
 import com.example.backend.model.dto.user.LoginUserDto;
 import com.example.backend.model.dto.user.NewUserDto;
 import com.example.backend.model.dto.user.UserDto;
-import com.example.backend.response.ResponseMessage;
 import com.example.backend.security.jwt.JwtUtils;
 import com.example.backend.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,16 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.TestingAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import java.security.InvalidParameterException;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,8 +68,8 @@ class AuthControllerTest {
 
     @Test
     void loginUserIfLoginUserDtoIsNull() {
-        InvalidParameterException exception = assertThrows(
-                InvalidParameterException.class,
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
                 () -> authController.loginUser(null, response)
         );
 
@@ -122,8 +115,8 @@ class AuthControllerTest {
 
     @Test
     void registerUserIfNewUserDtoIsNull() {
-        InvalidParameterException exception = assertThrows(
-                InvalidParameterException.class,
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
                 () -> authController.registerUser(null, response)
         );
 

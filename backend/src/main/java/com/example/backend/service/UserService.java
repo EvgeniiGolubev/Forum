@@ -7,20 +7,18 @@ import com.example.backend.model.dto.user.UserDto;
 import com.example.backend.model.entity.user.User;
 import com.example.backend.security.UserDetailsImpl;
 
-import java.security.InvalidParameterException;
-
 public interface UserService {
-    User saveUser(NewUserDto newUserDto) throws InvalidParameterException;
+    User saveUser(NewUserDto newUserDto) throws IllegalArgumentException;
 
-    User getUserFromUserDetails(UserDetailsImpl authenticatedUser) throws InvalidParameterException;
+    User getUserFromUserDetails(UserDetailsImpl authenticatedUser) throws IllegalArgumentException;
 
-    User findUserById(Long id) throws InvalidParameterException, UserNotFoundException;
+    User findUserById(Long id) throws IllegalArgumentException, UserNotFoundException;
 
-    User updateUser(User user) throws InvalidParameterException;
+    User updateUser(User user) throws IllegalArgumentException;
 
-    void checkEmailExists(String email) throws InvalidParameterException, UserAlreadyExistsException;
+    void checkEmailExists(String email) throws IllegalArgumentException, UserAlreadyExistsException;
 
-    void checkNameExists(String name) throws InvalidParameterException, UserAlreadyExistsException;
+    void checkNameExists(String name) throws IllegalArgumentException, UserAlreadyExistsException;
 
-    UserDto getUserDtoByEmail(String email) throws UserNotFoundException, InvalidParameterException;
+    UserDto getUserDtoByEmail(String email) throws IllegalArgumentException, UserNotFoundException;
 }

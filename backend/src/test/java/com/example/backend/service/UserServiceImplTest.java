@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.security.InvalidParameterException;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -72,8 +71,8 @@ class UserServiceImplTest {
 
     @Test
     void saveUserIfNewUserIsNull() {
-        InvalidParameterException exception = assertThrows(
-                InvalidParameterException.class,
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
                 () -> userService.saveUser(null)
         );
 
@@ -111,8 +110,8 @@ class UserServiceImplTest {
 
     @Test
     void getUserFromUserDetailsIfAuthenticatedUserIsNull() {
-        InvalidParameterException exception = assertThrows(
-                InvalidParameterException.class,
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
                 () -> userService.getUserFromUserDetails(null)
         );
 
@@ -144,8 +143,8 @@ class UserServiceImplTest {
 
     @Test
     void findUserByIdIfIdIsNull() {
-        InvalidParameterException exception = assertThrows(
-                InvalidParameterException.class,
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
                 () -> userService.findUserById(null)
         );
 
@@ -202,8 +201,8 @@ class UserServiceImplTest {
 
     @Test
     void updateUserIfUpdatedUserIsNull() {
-        InvalidParameterException exception = assertThrows(
-                InvalidParameterException.class,
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
                 () -> userService.updateUser(null)
         );
 
@@ -223,8 +222,8 @@ class UserServiceImplTest {
 
     @Test
     void checkEmailExistsIfEmailIsNull() {
-        InvalidParameterException exception = assertThrows(
-                InvalidParameterException.class,
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
                 () -> userService.checkEmailExists(null)
         );
 
@@ -259,8 +258,8 @@ class UserServiceImplTest {
 
     @Test
     void checkEmailExistsIfNameIsNull() {
-        InvalidParameterException exception = assertThrows(
-                InvalidParameterException.class,
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
                 () -> userService.checkNameExists(null)
         );
 
@@ -302,8 +301,8 @@ class UserServiceImplTest {
 
     @Test
     void getUserDtoByEmailWhenEmailIsNull() {
-        InvalidParameterException exception = assertThrows(
-                InvalidParameterException.class,
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
                 () -> userService.getUserDtoByEmail(null)
         );
 

@@ -80,7 +80,7 @@ public class AuthController {
 
             response.addCookie(jwtUtils.makeCookie(userDto.getEmail()));
         } catch (AuthenticationException e) {
-            throw new UserAuthenticationException("Invalid email or password", HttpStatus.UNAUTHORIZED);
+            throw new UserAuthenticationException("Invalid email or password");
         }
     }
 }
