@@ -4,6 +4,7 @@ import com.example.backend.exception.UserAuthenticationException;
 import com.example.backend.model.dto.user.LoginUserDto;
 import com.example.backend.model.dto.user.NewUserDto;
 import com.example.backend.model.dto.user.UserDto;
+import com.example.backend.model.entity.user.User;
 import com.example.backend.security.jwt.JwtUtils;
 import com.example.backend.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,17 +50,18 @@ class AuthControllerTest {
 
     @Test
     void loginUserWithValidFieldsInLoginUserDto() {
-        LoginUserDto user = new LoginUserDto();
-        user.setEmail("test@mail.ru");
-        user.setPassword("password");
+        LoginUserDto loginUserDto = new LoginUserDto();
+        loginUserDto.setEmail("test@mail.ru");
+        loginUserDto.setPassword("password");
 
-        UserDto userDto = new UserDto();
+        User user =new User();
+        UserDto userDto = new UserDto(user);
 
-        Set<ConstraintViolation<LoginUserDto>> violations = validator.validate(user);
+        Set<ConstraintViolation<LoginUserDto>> violations = validator.validate(loginUserDto);
 
-        when(userService.getUserDtoByEmail(user.getEmail())).thenReturn(userDto);
+        when(userService.findUserByEmail(loginUserDto.getEmail())).thenReturn(user);
 
-        ResponseEntity<?> responseEntity = authController.loginUser(user, response);
+        ResponseEntity<?> responseEntity = authController.loginUser(loginUserDto, response);
 
         assertThat(violations).isEmpty();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -94,19 +96,20 @@ class AuthControllerTest {
 
     @Test
     void registerUserWithValidFieldsInNewUserDto() {
-        NewUserDto user = new NewUserDto();
-        user.setEmail("test@mail.ru");
-        user.setPassword("password");
-        user.setConfirmPassword("password");
-        user.setName("John Doe");
+        NewUserDto newUserDto = new NewUserDto();
+        newUserDto.setEmail("test@mail.ru");
+        newUserDto.setPassword("password");
+        newUserDto.setConfirmPassword("password");
+        newUserDto.setName("John Doe");
 
-        UserDto userDto = new UserDto();
+        User user = new User();
+        UserDto userDto = new UserDto(user);
 
-        Set<ConstraintViolation<NewUserDto>> violations = validator.validate(user);
+        Set<ConstraintViolation<NewUserDto>> violations = validator.validate(newUserDto);
 
-        when(userService.getUserDtoByEmail(user.getEmail())).thenReturn(userDto);
+        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
 
-        ResponseEntity<?> responseEntity = authController.registerUser(user, response);
+        ResponseEntity<?> responseEntity = authController.registerUser(newUserDto, response);
 
         assertThat(violations).isEmpty();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());

@@ -1,12 +1,17 @@
 package com.example.backend.controller;
 
-import com.example.backend.model.dto.ArticleDto;
+import com.example.backend.model.dto.article.ArticleDto;
+import com.example.backend.model.entity.user.Role;
+import com.example.backend.model.entity.user.User;
 import com.example.backend.security.UserDetailsImpl;
 import com.example.backend.service.ArticleService;
+import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -14,15 +19,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/articles")
 public class ArticleController {
     private final ArticleService articleService;
+    private final UserService userService;
 
     @Autowired
-    public ArticleController(ArticleService articleService) {
+    public ArticleController(ArticleService articleService, UserService userService) {
         this.articleService = articleService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -32,6 +40,7 @@ public class ArticleController {
             @RequestParam("pageSize") int pageSize
     ) {
         Page<ArticleDto> articles = articleService.findAllArticles(sortType, page, pageSize);
+
         return new ResponseEntity<>(articles, HttpStatus.OK);
     }
 
@@ -42,24 +51,31 @@ public class ArticleController {
     }
 
     @PreAuthorize("hasAuthority('USER')")
-    @PostMapping
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> createArticle(
-            @AuthenticationPrincipal UserDetailsImpl author,
-            @Valid @RequestPart("article") ArticleDto articleDto,
+            @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
+            @Valid @ModelAttribute ArticleDto articleDto,
             @RequestPart(name = "images", required = false) List<MultipartFile> images
     ) {
+        User author = userService.getUserFromUserDetails(authenticatedUser);
+
         ArticleDto article = articleService.createArticle(author, articleDto, images);
         return new ResponseEntity<>(article, HttpStatus.OK);
     }
 
     @PreAuthorize("hasAuthority('USER')")
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateArticle(
             @PathVariable("id") Long id,
-            @AuthenticationPrincipal UserDetailsImpl author,
-            @Valid @RequestPart("article") ArticleDto articleDto,
+            @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
+            @Valid @ModelAttribute ArticleDto articleDto,
             @RequestPart(name = "images", required = false) List<MultipartFile> images
     ) {
+        User actualAuthor = articleService.getArticleAuthorByArticleId(id);
+        User author = userService.getUserFromUserDetails(authenticatedUser);
+
+        checkAccess(actualAuthor, author);
+
         ArticleDto article = articleService.updateArticle(id, author, articleDto, images);
         return new ResponseEntity<>(article, HttpStatus.OK);
     }
@@ -68,9 +84,22 @@ public class ArticleController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteArticle(
             @PathVariable("id") Long id,
-            @AuthenticationPrincipal UserDetailsImpl author
+            @AuthenticationPrincipal UserDetailsImpl authenticatedUser
     ) {
+        User actualAuthor = articleService.getArticleAuthorByArticleId(id);
+        User author = userService.getUserFromUserDetails(authenticatedUser);
+
+        checkAccess(actualAuthor, author);
+
         articleService.deleteArticle(id, author);
         return new ResponseEntity<>("Article delete successfully", HttpStatus.OK);
+    }
+
+    private void checkAccess(User actualAuthor, User author) throws AccessDeniedException {
+        Set<Role> roles = author.getRoles();
+
+        if (!author.equals(actualAuthor) && !roles.contains(Role.ADMIN) && !roles.contains(Role.MODERATOR)) {
+            throw new AccessDeniedException("Access denied. Only the author can modify or delete the article");
+        }
     }
 }

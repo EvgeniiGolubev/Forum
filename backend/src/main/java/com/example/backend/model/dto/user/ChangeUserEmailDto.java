@@ -6,7 +6,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
-public abstract class AuthUserDto implements Serializable {
+public class ChangeUserEmailDto implements Serializable {
     @JsonProperty("email")
     @Email(message = "Email is not correct")
     @NotBlank(message = "Email cannot be empty")

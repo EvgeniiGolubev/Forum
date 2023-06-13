@@ -2,28 +2,28 @@ package com.example.backend.model.dto.user;
 
 import com.example.backend.model.entity.user.Role;
 import com.example.backend.model.entity.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Set;
 
 public class UserDto implements Serializable {
-    @JsonProperty("id")
     private Long id;
     @JsonProperty("email")
+    @Email(message = "Email is not correct")
+    @NotBlank(message = "Email can not be empty")
     private String email;
     @JsonProperty("name")
+    @NotBlank(message = "Name can not be empty")
     private String name;
     @JsonProperty("userPicture")
     private String userPicture;
-    @JsonProperty("local")
-    private String locale;
-    @JsonProperty("provider")
-    private String provider;
-    @JsonProperty("status")
     private String status;
-    @JsonProperty("roles")
     private Set<Role> roles;
+    private String locale;
+    private String provider;
 
     public UserDto() {}
 
@@ -38,10 +38,12 @@ public class UserDto implements Serializable {
         this.roles = user.getRoles();
     }
 
+    @JsonProperty("id")
     public Long getId() {
         return id;
     }
 
+    @JsonIgnore
     public void setId(Long id) {
         this.id = id;
     }
@@ -70,34 +72,42 @@ public class UserDto implements Serializable {
         this.userPicture = userPicture;
     }
 
+    @JsonProperty("local")
     public String getLocale() {
         return locale;
     }
 
+    @JsonIgnore
     public void setLocale(String locale) {
         this.locale = locale;
     }
 
+    @JsonProperty("provider")
     public String getProvider() {
         return provider;
     }
 
+    @JsonIgnore
     public void setProvider(String provider) {
         this.provider = provider;
     }
 
+    @JsonProperty("status")
     public String getStatus() {
         return status;
     }
 
+    @JsonIgnore
     public void setStatus(String status) {
         this.status = status;
     }
 
+    @JsonProperty("roles")
     public Set<Role> getRoles() {
         return roles;
     }
 
+    @JsonIgnore
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }

@@ -48,6 +48,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     Collections.singleton(Role.USER)
             );
 
+            newUser.setActive(true);
+
             userRepository.save(newUser);
 
             return new DefaultOAuth2User(Collections.singleton(Role.USER), oAuth2User.getAttributes(), "email");

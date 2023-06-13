@@ -1,4 +1,4 @@
-package com.example.backend.model.entity;
+package com.example.backend.model.entity.article;
 
 import com.example.backend.model.entity.user.User;
 
@@ -27,7 +27,7 @@ public class Article {
     @Column(name="creation_date", updatable = false)
     private LocalDateTime creationDate;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "image_links")
     private List<String> imageLinks = new ArrayList<>();
 

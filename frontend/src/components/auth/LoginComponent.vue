@@ -21,6 +21,9 @@
       </div>
       <button type="submit">Sign in</button>
     </form>
+
+    <br/>
+    <a href="/oauth2/authorization/google">Sign up with Google</a>
   </div>
 </template>
 

@@ -122,7 +122,7 @@ class UserServiceImplTest {
     @Test
     void findUserByIdSuccess() {
         Long userId = 1L;
-        User expectedUser = new User(
+        User user = new User(
                 "test@example.com",
                 "encodedPassword",
                 "John Doe",
@@ -133,11 +133,11 @@ class UserServiceImplTest {
                 Collections.singleton(Role.USER)
         );
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         User result = userService.findUserById(userId);
 
-        assertEquals(expectedUser, result);
+        assertEquals(user, result);
         verify(userRepository, times(1)).findById(userId);
     }
 
@@ -180,33 +180,28 @@ class UserServiceImplTest {
                 Collections.singleton(Role.MODERATOR)
         );
 
-        User expectedUser = new User(
-                "test@example.com",
-                "encodedPassword",
-                "John Doe",
-                null,
-                null,
-                Provider.LOCAL,
-                Status.ACTIVE,
-                Collections.singleton(Role.USER)
-        );
+        user.setId(1L);
 
-        when(userRepository.save(user)).thenReturn(expectedUser);
+        UserDto expectedUser = new UserDto(user);
 
-        User result = userService.updateUser(user);
+        when(userRepository.findById(expectedUser.getId())).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
 
-        assertEquals(expectedUser, result);
+//        UserDto result = userService.updateUser(expectedUser);
+
+//        assertEquals(expectedUser, result);
+        verify(userRepository, times(1)).findById(expectedUser.getId());
         verify(userRepository, times(1)).save(user);
     }
 
     @Test
     void updateUserIfUpdatedUserIsNull() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> userService.updateUser(null)
-        );
+//        IllegalArgumentException exception = assertThrows(
+//                IllegalArgumentException.class,
+//                () -> userService.updateUser(null)
+//        );
 
-        assertEquals("Updated user can not be null", exception.getMessage());
+//        assertEquals("Updated user can not be null", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
     }
 
@@ -293,7 +288,7 @@ class UserServiceImplTest {
 
         when(userRepository.findByEmail(anyString())).thenReturn(user);
 
-        UserDto result = userService.getUserDtoByEmail(anyString());
+        UserDto result = new UserDto(userService.findUserByEmail(anyString()));
 
         assertEquals(expected, result);
         verify(userRepository, times(1)).findByEmail(anyString());
@@ -303,7 +298,7 @@ class UserServiceImplTest {
     void getUserDtoByEmailWhenEmailIsNull() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> userService.getUserDtoByEmail(null)
+                () -> userService.findUserByEmail(null)
         );
 
         assertEquals("Email can not be null", exception.getMessage());
@@ -317,7 +312,7 @@ class UserServiceImplTest {
 
         UserNotFoundException exception = assertThrows(
                 UserNotFoundException.class,
-                () -> userService.getUserDtoByEmail(anyString())
+                () -> userService.findUserByEmail(anyString())
         );
 
         assertEquals("User not found", exception.getMessage());

@@ -1,7 +1,10 @@
 package com.example.backend.model.entity.user;
 
+import com.example.backend.model.entity.article.Article;
+
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -15,7 +18,7 @@ public class User {
     @Column(name="email", nullable = false)
     private String email;
 
-    @Column(name="password", nullable = false)
+    @Column(name="password")
     private String password;
 
     @Column(name="name", nullable = false)
@@ -35,6 +38,12 @@ public class User {
     @Column(name = "status")
     private Status status;
 
+    @Column(name = "active")
+    private boolean active;
+
+    @Column(name = "activation_code")
+    private String activationCode;
+
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
@@ -45,6 +54,9 @@ public class User {
 
     @OneToMany(mappedBy = "channel", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<UserSubscription> subscribers = new HashSet<>();
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private List<Article> articles;
 
     public User() {}
 
@@ -154,6 +166,30 @@ public class User {
 
     public void setSubscribers(Set<UserSubscription> subscribers) {
         this.subscribers = subscribers;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public String getActivationCode() {
+        return activationCode;
+    }
+
+    public void setActivationCode(String activationCode) {
+        this.activationCode = activationCode;
+    }
+
+    public List<Article> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(List<Article> articles) {
+        this.articles = articles;
     }
 
     @Override

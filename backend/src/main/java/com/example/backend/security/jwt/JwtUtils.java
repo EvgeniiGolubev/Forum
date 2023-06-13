@@ -31,4 +31,13 @@ public class JwtUtils {
 
         return cookie;
     }
+
+    public Cookie clearCookie() {
+        Cookie cookie = new Cookie(authCookieName, null);
+        cookie.setMaxAge(0);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+
+        return cookie;
+    }
 }

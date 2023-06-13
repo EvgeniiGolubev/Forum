@@ -1,11 +1,12 @@
 package com.example.backend.exception.handler;
 
 import com.example.backend.exception.*;
-import com.example.backend.response.ResponseMessage;
+import com.example.backend.model.response.ResponseMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,7 +24,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<?> handleInvalidParameterException(IllegalArgumentException e) {
+    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
         LOGGER.warn("Invalid parameter passed. Message: " + e.getMessage());
         return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
@@ -46,6 +47,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FileManagerException.class)
     public ResponseEntity<?> handleFileManagerException(FileManagerException e) {
         LOGGER.error("Error in the file system. Message: " + e.getMessage());
+        return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e) {
+        LOGGER.error("Attempted operation not allowed. Message: " + e.getMessage());
         return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

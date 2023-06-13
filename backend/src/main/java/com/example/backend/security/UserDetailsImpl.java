@@ -1,6 +1,7 @@
 package com.example.backend.security;
 
 import com.example.backend.model.entity.user.Role;
+import com.example.backend.model.entity.user.Status;
 import com.example.backend.model.entity.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,8 @@ public class UserDetailsImpl implements UserDetails {
     private String email;
     private String password;
     private Set<Role> roles;
+    private boolean status;
+    private boolean active;
 
     public UserDetailsImpl() {
     }
@@ -19,6 +22,8 @@ public class UserDetailsImpl implements UserDetails {
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.roles = user.getRoles();
+        this.status = user.getStatus().equals(Status.ACTIVE);
+        this.active = user.isActive();
     }
 
     @Override
@@ -38,22 +43,22 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return status;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return status;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return status;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return active;
     }
 
     public void setUsername(String email) {

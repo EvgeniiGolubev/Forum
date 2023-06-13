@@ -1,7 +1,6 @@
 package com.example.backend.config;
 
 import com.example.backend.security.jwt.JwtTokenFilter;
-import com.example.backend.security.jwt.JwtTokenProvider;
 import com.example.backend.security.jwt.JwtUtils;
 import com.example.backend.security.oauth2.CustomOAuth2UserService;
 import org.slf4j.Logger;
@@ -60,8 +59,8 @@ public class WebSecurityConfig {
                 .cors().configurationSource(corsConfigurationSource())
                 .and()
                     .authorizeRequests()
-                    .antMatchers("/", "/img/*", "/login**", "/register**", "/static/**",
-                        "/error**", "/api/articles", "/api/auth/**").permitAll()
+                    .antMatchers("/", "/img/*", "/login**", "/registration**", "/static/**",
+                        "/error**", "/api/articles/**", "/api/auth/**", "/confirm-email").permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .logout().logoutUrl("/logout").logoutSuccessUrl("/login")
@@ -118,7 +117,7 @@ public class WebSecurityConfig {
             OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
             String email = oauth2User.getAttribute("email");
             response.addCookie(jwtUtils.makeCookie(email));
-            response.sendRedirect("/success");
+            response.sendRedirect("/registration/oauth2-success");
 
             LOGGER.info("Successful OAuth2 authentication");
         };
