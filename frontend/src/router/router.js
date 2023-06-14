@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginPage from "@/pages/auth/LoginPage.vue";
-import RegisterComponent from "@/pages/auth/RegisterComponent.vue";
+import RegisterPage from "@/pages/auth/RegisterPage.vue";
 import ConfirmEmail from "@/pages/auth/ConfirmEmail.vue";
 import Oauth2Success from "@/pages/auth/Oauth2Success.vue";
 import MainComponent from "@/pages/MainComponent.vue";
@@ -12,7 +12,7 @@ const router = createRouter({
     routes: [
         { path: '/', name: 'MainComponent', component: MainComponent },
         { path: '/login', name: 'LoginPage', component: LoginPage },
-        { path: '/registration', name: 'RegisterComponent', component: RegisterComponent },
+        { path: '/registration', name: 'RegisterPage', component: RegisterPage },
         { path: '/confirm-email', name: 'ConfirmEmail', component: ConfirmEmail },
         { path: '/registration/oauth2-success', name: 'Oauth2Success', component: Oauth2Success },
         { path: '/profile', name: 'ProfileComponent', component: ProfileComponent },
