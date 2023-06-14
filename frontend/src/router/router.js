@@ -6,6 +6,8 @@ import Oauth2Success from "@/pages/auth/Oauth2Success.vue";
 import MainComponent from "@/pages/MainComponent.vue";
 import ProfileComponent from "@/pages/ProfileComponent.vue";
 import UsersComponent from "@/pages/UsersComponent.vue";
+import ArticlePage from "@/pages/ArticlePage.vue";
+import ActivityFeed from "@/pages/ActivityFeed.vue";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -17,6 +19,8 @@ const router = createRouter({
         { path: '/registration/oauth2-success', name: 'Oauth2Success', component: Oauth2Success },
         { path: '/profile', name: 'ProfileComponent', component: ProfileComponent },
         { path: '/users', name: 'UsersComponent', component: UsersComponent },
+        { path: '/article', name: 'ArticlePage', component: ArticlePage },
+        { path: '/activity-feed', name: 'ActivityFeed', component: ActivityFeed },
     ]
 })
 

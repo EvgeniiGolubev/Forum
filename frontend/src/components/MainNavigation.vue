@@ -3,43 +3,49 @@
     <div class="container">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
         <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
-          <img src="/logo.png" class="bi me-2" width="40" height="40"/>
+          <img src="/img/logo.png" class="bi me-2" width="40" height="40"/>
         </a>
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <li>
-            <a href="/" class="nav-link px-2 link-secondary">Home</a>
+            <router-link class="nav-link px-2 link-secondary" to="/">Home</router-link>
           </li>
           <li>
-            <a href="/" class="nav-link px-2 text-blue">Main</a>
+            <router-link class="nav-link px-2 text-blue" to="/">Main</router-link>
           </li>
           <li>
-            <a href="/profile" class="nav-link px-2 text-blue">Profile</a>
+            <router-link class="nav-link px-2 text-blue" to="/profile" v-if="isVisible">Profile</router-link>
           </li>
           <li>
-            <a href="/post-article" class="nav-link px-2 text-blue">Post article</a>
+            <router-link class="nav-link px-2 text-blue" to="/article" v-if="isVisible">Create new article</router-link>
           </li>
           <li>
-            <!--            HERE-->
-            <router-link class="nav-link px-2 link-body-emphasis" to="/users" v-if="isVisible">Users</router-link>
+            <router-link class="nav-link px-2 text-blue" to="/activity-feed" v-if="isVisible">Activity Feed</router-link>
+          </li>
+          <li>
+            <router-link class="nav-link px-2 text-blue" to="/users" v-if="isAdminOrModerator">Users</router-link>
           </li>
         </ul>
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-          <input type="search" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" placeholder="Search..." aria-label="Search"/>
-        </form>
-        <div class="dropdown text-end" v-if="isVisible">
-          <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" @click="toggleDropdown">
-            <img src="https://github.com/mdo.png" alt="user-pic" width="32" height="32" class="rounded-circle"/>
+        <div class="d-flex flex-wrap dropdown text-end" v-if="isVisible">
+          <div class="name mx-3">
+            <span>{{ name }}</span>
+          </div>
+          <a href="#" class="d-block link-dark text-decoration-none" @click="toggleDropdown">
+            <div v-if="picture !== null">
+              <img :src="picture" alt="user-pic" width="42" height="42" class="rounded-circle"/>
+            </div>
+            <div v-else>
+              <font-awesome-icon :icon="['far', 'user']" size="2xl" class="py-1"/>
+            </div>
           </a>
-          <ul class="dropdown-menu text-small show" data-popper-placement="bottom-start" v-show="showDropdown"
-              style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(-62px, 34px);">
+          <ul class="dropdown-menu text-small show drop" data-popper-placement="bottom-start" v-show="showDropdown">
             <li>
-              <a href="#" class="dropdown-item">Create new article</a>
+              <router-link class="dropdown-item" to="/profile">Profile</router-link>
             </li>
             <li>
-              <a href="#" class="dropdown-item">Profile</a>
+              <router-link class="dropdown-item" to="/article">Creat new article</router-link>
             </li>
             <li>
-              <a href="#" class="dropdown-item">Some things</a>
+              <router-link class="dropdown-item" to="/activity-feed">Activity Feed</router-link>
             </li>
             <li>
               <hr class="dropdown-divider"/>
@@ -59,9 +65,68 @@
 </template>
 
 <script>
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome"
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
 
+library.add(fas, far)
+export default {
+  components: {FontAwesomeIcon},
+  data() {
+    return {
+      showDropdown: false,
+    }
+  },
+  computed: {
+    isVisible() {
+      return this.$store.getters.isAuthenticated
+    },
+    isAdminOrModerator() {
+      return this.$store.getters.isAdmin || this.$store.getters.isModerator
+    },
+    name() {
+      let name = this.$store.getters.getName
+      if (name) {
+        return name
+      }
+
+      return 'User name'
+    },
+    picture() {
+      let picture = this.$store.getters.getPicture
+      if (picture) {
+        if (picture.startsWith('https://')) {
+          return picture
+        } else {
+          return `/img/${picture}`
+        }
+      }
+
+      return null
+    }
+  },
+  methods: {
+    toggleDropdown() {
+      this.showDropdown = !this.showDropdown
+    },
+    logout() {
+      this.$store.dispatch('logoutAction')
+    }
+  }
+}
 </script>
 
 <style>
-
+.drop {
+  position: absolute;
+  inset: 0px auto auto 0px;
+  margin: 0px;
+  transform: translate(40px, 50px);
+}
+.name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 </style>

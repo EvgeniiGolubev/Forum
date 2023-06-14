@@ -3,6 +3,8 @@ import {createStore} from 'vuex'
 const state = {
     authenticate: localStorage.getItem('user-authenticate') || '',
     role: localStorage.getItem('user-role') || '',
+    name: localStorage.getItem('user-name') || '',
+    picture: localStorage.getItem('user-picture') || '',
 }
 
 const getters = {
@@ -15,12 +17,22 @@ const getters = {
     isModerator: state => {
         return state.role === 'admin' || state.role === 'moderator'
     },
+    getName: state => {
+        return state.name
+    },
+    getPicture: state => {
+        return state.picture
+    },
 }
 
 const mutations = {
     loginMutation: (state, user) => {
         localStorage.setItem("user-authenticate", user.authenticate)
+        localStorage.setItem("user-name", user.name)
+        localStorage.setItem("user-picture", user.picture)
         state.authenticate = user.authenticate
+        state.name = user.name
+        state.picture = user.picture
 
         let isUser = false
         let isModerator = false
@@ -54,8 +66,12 @@ const mutations = {
     logoutMutation: () => {
         state.authenticate = false
         state.role = ''
+        store.name =''
+        store.picture = ''
         localStorage.removeItem("user-authenticate")
         localStorage.removeItem("user-role")
+        localStorage.removeItem("user-name")
+        localStorage.removeItem("user-picture")
     }
 }
 

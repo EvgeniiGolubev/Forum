@@ -25,6 +25,8 @@ export default {
           this.$store.dispatch('loginAction', {
             authenticate: true,
             roles: response.data.roles,
+            name: response.data.name,
+            picture: response.data.userPicture,
           })
 
           this.alertMessage = 'You successfully sign in'

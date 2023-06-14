@@ -11,7 +11,7 @@
   <main class="form-signin">
     <div class="container">
       <form ref="form" @submit.prevent="submitForm" class="needs-validation" novalidate>
-        <img class="mb-4" src="/logo.png" width="100" height="100"/>
+        <img class="mb-4" src="/img/logo.png" width="100" height="100"/>
         <h1 class="h3 mb-3 fw-normal">Sign up</h1>
         <div class="form-floating">
           <input type="email" class="form-control" id="email" placeholder="name@example.com" v-model="email" required>
