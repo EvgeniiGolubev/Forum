@@ -1,16 +1,15 @@
 <template>
-  <a href="/logout" style="margin: 5px">Logout</a>
-  <router-link to="/login" style="margin: 5px">Login</router-link>
-  <router-link to="/" style="margin: 5px">Main</router-link>
-  <router-link to="/registration" style="margin: 5px">Registration</router-link>
-  <router-link to="/profile" style="margin: 5px">Profile</router-link>
-  <router-link to="/users" style="margin: 5px">Users</router-link>
+  <main-navigation/>
   <router-view></router-view>
 </template>
 
 <script>
+import MainNavigation from '@/components/MainNavigation.vue'
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    MainNavigation
+  }
 }
 </script>
 

@@ -1,17 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginComponent from "@/components/auth/LoginComponent.vue";
-import RegisterComponent from "@/components/auth/RegisterComponent.vue";
-import ConfirmEmail from "@/components/auth/ConfirmEmail.vue";
-import Oauth2Success from "@/components/auth/Oauth2Success.vue";
-import MainComponent from "@/components/MainComponent.vue";
-import ProfileComponent from "@/components/ProfileComponent.vue";
-import UsersComponent from "@/components/UsersComponent.vue";
+import LoginPage from "@/pages/auth/LoginPage.vue";
+import RegisterComponent from "@/pages/auth/RegisterComponent.vue";
+import ConfirmEmail from "@/pages/auth/ConfirmEmail.vue";
+import Oauth2Success from "@/pages/auth/Oauth2Success.vue";
+import MainComponent from "@/pages/MainComponent.vue";
+import ProfileComponent from "@/pages/ProfileComponent.vue";
+import UsersComponent from "@/pages/UsersComponent.vue";
 
 const router = createRouter({
     history: createWebHistory(),
     routes: [
         { path: '/', name: 'MainComponent', component: MainComponent },
-        { path: '/login', name: 'LoginComponent', component: LoginComponent },
+        { path: '/login', name: 'LoginPage', component: LoginPage },
         { path: '/registration', name: 'RegisterComponent', component: RegisterComponent },
         { path: '/confirm-email', name: 'ConfirmEmail', component: ConfirmEmail },
         { path: '/registration/oauth2-success', name: 'Oauth2Success', component: Oauth2Success },

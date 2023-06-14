@@ -1,0 +1,106 @@
+<template>
+  <div class="alert-holder">
+    <div class="alert alert-danger" role="alert" v-for="(error, index) in errors" :key="index" v-bind:class="{ 'show': errors.length }">
+      {{ error.message }}
+    </div>
+  </div>
+
+  <main class="form-signin">
+    <div class="container">
+      <form ref="form" @submit.prevent="submitForm" class="needs-validation" novalidate>
+        <img class="mb-4"/>
+        <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+        <div class="form-floating">
+          <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" v-model="email" required>
+          <label for="floatingInput">Email address</label>
+          <div class="invalid-feedback" >Please provide a valid email address.</div>
+        </div>
+        <div class="form-floating mt-3">
+          <input type="password" class="form-control" id="floatingPassword" placeholder="Password" v-model="password" required minlength="1">
+          <label for="floatingPassword">Password</label>
+          <div class="invalid-feedback" >Password must be at least 8 characters long.</div>
+        </div>
+        <button class="btn btn-primary w-100 mt-3">Sign-in</button>
+      </form>
+      <div class="mt-4">
+        <a href="/oauth2/authorization/google" >Sign up with Google</a>
+      </div>
+    </div>
+  </main>
+</template>
+
+<script>
+import {AXIOS} from "@/http-commons";
+
+export default {
+  data() {
+    return {
+      email: '',
+      password: '',
+      errors: [],
+    }
+  },
+  methods: {
+    submitForm() {
+      this.errors = []
+
+      const user = {
+        email: this.email,
+        password: this.password
+      }
+      AXIOS.post('/auth/login', user)
+          .then(response => {
+            this.$store.dispatch('loginAction', {
+              authenticate: true,
+              roles: response.data.roles,
+            })
+
+            this.$router.push('/profile')
+          })
+          .catch(error => {
+            if (!Array.isArray(error.response.data)) {
+              this.errors.push(error.response.data)
+            }
+
+            setTimeout(() => {
+              this.errors = [];
+            }, 5000)
+          })
+    }
+  },
+  mounted() {
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        form.classList.add('was-validated');
+      }, false);
+    });
+  },
+}
+</script>
+
+<style scoped>
+.form-signin {
+  max-width: 400px;
+  margin: 0 auto;
+}
+.alert-holder {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.alert {
+  /* Стили для каждого сообщения об ошибке */
+  opacity: 0; /* Установите начальное значение прозрачности 0 */
+  transition: opacity 0.3s ease; /* Добавьте переход для свойства opacity */
+}
+
+.alert.show {
+  opacity: 1; /* Установите конечное значение прозрачности 1 для показа сообщения */
+}
+</style>
