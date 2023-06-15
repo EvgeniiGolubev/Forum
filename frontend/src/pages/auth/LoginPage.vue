@@ -22,7 +22,10 @@
         </div>
         <button class="btn btn-primary w-100 mt-3">Sign-in</button>
       </form>
-      <div class="mt-4">
+      <div class="mt-2">
+        <button type="button" class="btn btn-link" v-on:click="toRegistration()">Registration</button>
+      </div>
+      <div class="mt-2">
         <a href="/oauth2/authorization/google" >Sign in with Google</a>
       </div>
     </div>
@@ -68,6 +71,9 @@ export default {
               this.errors = [];
             }, 5000)
           })
+    },
+    toRegistration() {
+      this.$router.push('/registration')
     }
   },
   mounted() {

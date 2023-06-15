@@ -57,7 +57,7 @@
         </div>
         <div class="text-end" v-else>
           <router-link class="btn btn-outline-primary me-2" to="/login">Sign in</router-link>
-          <router-link class="btn btn-primary" to="/register">Sign up</router-link>
+          <router-link class="btn btn-primary" to="/registration">Sign up</router-link>
         </div>
       </div>
     </div>

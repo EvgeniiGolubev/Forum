@@ -13,8 +13,8 @@ public class PageableUtil {
             throw new IllegalArgumentException("Sort type cannot be null");
         }
 
-        if (page < 0) {
-            throw new IllegalArgumentException("Page number must be non-negative");
+        if (page < 1) {
+            throw new IllegalArgumentException("Page number must be greater than 1");
         }
 
         if (pageSize < 0) {
@@ -23,7 +23,7 @@ public class PageableUtil {
 
         try {
             Sort sort = Sort.by(Sort.Direction.fromString(sortType), sortField);
-            return PageRequest.of(page, pageSize, sort);
+            return PageRequest.of(page - 1, pageSize, sort);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid sortType value! Must be 'DESC' or 'ASC");
         }

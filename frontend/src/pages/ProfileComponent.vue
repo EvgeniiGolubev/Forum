@@ -181,6 +181,9 @@ export default {
             }
           })
     },
+    getProfileById(profileId) {
+      console.log(profileId)
+    },
     changeProfile() {
       const formData = new FormData();
       formData.append('name', this.name);
@@ -263,6 +266,9 @@ export default {
     },
   },
   mounted() {
+    const profileId = this.$route.query.id;
+    this.getProfileById(profileId);
+
     this.getSubscribers()
     this.getSubscriptions()
     this.getProfile()
