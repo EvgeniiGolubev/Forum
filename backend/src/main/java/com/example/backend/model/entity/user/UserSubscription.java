@@ -1,9 +1,12 @@
 package com.example.backend.model.entity.user;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "user_subscriptions")
+@Data
 public class UserSubscription {
     @EmbeddedId
     private UserSubscriptionId id;
@@ -25,38 +28,6 @@ public class UserSubscription {
         this.channel = channel;
         this.subscriber = subscriber;
         this.id = new UserSubscriptionId(channel.getId(), subscriber.getId());
-    }
-
-    public UserSubscriptionId getId() {
-        return id;
-    }
-
-    public void setId(UserSubscriptionId id) {
-        this.id = id;
-    }
-
-    public User getChannel() {
-        return channel;
-    }
-
-    public void setChannel(User chanel) {
-        this.channel = chanel;
-    }
-
-    public User getSubscriber() {
-        return subscriber;
-    }
-
-    public void setSubscriber(User subscriber) {
-        this.subscriber = subscriber;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
     }
 
     @Override

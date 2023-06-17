@@ -5,6 +5,7 @@ const state = {
     role: localStorage.getItem('user-role') || '',
     name: localStorage.getItem('user-name') || '',
     picture: localStorage.getItem('user-picture') || '',
+    id: localStorage.getItem('user-id') || '',
 }
 
 const getters = {
@@ -23,6 +24,9 @@ const getters = {
     getPicture: state => {
         return state.picture
     },
+    getId: state => {
+        return state.id
+    }
 }
 
 const mutations = {
@@ -30,9 +34,11 @@ const mutations = {
         localStorage.setItem("user-authenticate", user.authenticate)
         localStorage.setItem("user-name", user.name)
         localStorage.setItem("user-picture", user.picture)
+        localStorage.setItem("user-id", user.id)
         state.authenticate = user.authenticate
         state.name = user.name
         state.picture = user.picture
+        state.id = user.id
 
         let isUser = false
         let isModerator = false
@@ -66,12 +72,14 @@ const mutations = {
     logoutMutation: () => {
         state.authenticate = false
         state.role = ''
-        store.name =''
-        store.picture = ''
+        state.name =''
+        state.picture = ''
+        state.id = ''
         localStorage.removeItem("user-authenticate")
         localStorage.removeItem("user-role")
         localStorage.removeItem("user-name")
         localStorage.removeItem("user-picture")
+        localStorage.removeItem("user-id")
     }
 }
 

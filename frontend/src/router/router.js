@@ -17,9 +17,9 @@ const router = createRouter({
         { path: '/registration', name: 'RegisterPage', component: RegisterPage },
         { path: '/confirm-email', name: 'ConfirmEmail', component: ConfirmEmail },
         { path: '/registration/oauth2-success', name: 'Oauth2Success', component: Oauth2Success },
-        { path: '/profile', name: 'ProfileComponent', component: ProfileComponent },
+        { path: '/profile/:id?', name: 'ProfileComponent', component: ProfileComponent },
         { path: '/users', name: 'UsersComponent', component: UsersComponent },
-        { path: '/article', name: 'ArticlePage', component: ArticlePage },
+        { path: '/article/:id?', name: 'ArticlePage', component: ArticlePage },
         { path: '/activity-feed', name: 'ActivityFeed', component: ActivityFeed },
     ]
 })

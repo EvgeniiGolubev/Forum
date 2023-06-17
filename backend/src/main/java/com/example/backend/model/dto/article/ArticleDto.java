@@ -3,15 +3,17 @@ package com.example.backend.model.dto.article;
 import com.example.backend.model.dto.profile.UserProfileDto;
 import com.example.backend.model.entity.article.Article;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Data
 public class ArticleDto implements Serializable {
+    @JsonProperty("id")
     private Long id;
 
     @JsonProperty("title")
@@ -22,8 +24,11 @@ public class ArticleDto implements Serializable {
     @NotBlank(message = "Content can not be empty")
     private String content;
 
+    @JsonProperty("author")
     private UserProfileDto author;
 
+    @JsonProperty("creationDate")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime creationDate;
 
     @JsonProperty("imageLinks")
@@ -38,61 +43,6 @@ public class ArticleDto implements Serializable {
         this.author = new UserProfileDto(article.getAuthor());
         this.creationDate = article.getCreationDate();
         this.imageLinks = article.getImageLinks();
-    }
-
-    @JsonProperty("id")
-    public Long getId() {
-        return id;
-    }
-
-    @JsonIgnore
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    @JsonProperty("author")
-    public UserProfileDto getAuthor() {
-        return author;
-    }
-
-    @JsonIgnore
-    public void setAuthor(UserProfileDto author) {
-        this.author = author;
-    }
-
-    @JsonProperty("creationDate")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    public LocalDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    @JsonIgnore
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public List<String> getImageLinks() {
-        return imageLinks;
-    }
-
-    public void setImageLinks(List<String> imageLinks) {
-        this.imageLinks = imageLinks;
     }
 
     @Override

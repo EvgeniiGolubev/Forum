@@ -264,9 +264,20 @@ export default {
 
       return '/img/placeholder.jpg';
     },
+    subscribe(id) {
+      AXIOS.post(`/profile/subscriptions/${id}`, {}, {params: {subscriptionStatus: true}})
+          .then(response => {
+            this.responseMessages = response.data.message
+          })
+          .catch(error => {
+            if (!Array.isArray(error.response.data)) {
+              this.errors.push(error.response.data)
+            }
+          })
+    },
   },
   mounted() {
-    const profileId = this.$route.query.id;
+    const profileId = this.$route.params.id;
     this.getProfileById(profileId);
 
     this.getSubscribers()

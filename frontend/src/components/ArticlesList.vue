@@ -1,5 +1,5 @@
 <template>
-  <div class="album py-5 bg-body-tertiary">
+  <div class="album py-5">
     <div class="container">
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
         <div class="col" v-for="article in articles" :key="article.id">
@@ -10,7 +10,7 @@
               <h4 class="card-title text-md-start">{{ article.title }}</h4>
               <p class="card-text text-md-start">{{ truncateText(article.content) }}</p>
               <div class="d-flex justify-content-between align-items-center">
-                <button type="button" class="btn btn-link mд-auto" v-on:click="openAuthorProfile(article.author.id)">{{ article.author.name }}</button>
+                <button type="button" class="btn btn-link text-without-underline" v-on:click="openAuthorProfile(article.author.id)">{{ article.author.name }}</button>
               </div>
               <hr>
               <div class="d-flex justify-content-between align-items-center">
@@ -88,5 +88,9 @@ export default {
 .heart {
   margin-left: 15px;
   margin-right: 5px;
+}
+
+.text-without-underline {
+  text-decoration: none;
 }
 </style>

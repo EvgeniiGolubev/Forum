@@ -2,6 +2,7 @@ package com.example.backend.exception.handler;
 
 import com.example.backend.exception.*;
 import com.example.backend.model.response.ResponseMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,9 +15,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(UserAuthenticationException.class)
     public ResponseEntity<?> handleUserAuthenticationException(UserAuthenticationException e) {
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
-        LOGGER.warn("Invalid parameter passed. Message: " + e.getMessage());
+        log.warn("Invalid parameter passed. Message: " + e.getMessage());
         return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
@@ -46,13 +47,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileManagerException.class)
     public ResponseEntity<?> handleFileManagerException(FileManagerException e) {
-        LOGGER.error("Error in the file system. Message: " + e.getMessage());
+        log.error("Error in the file system. Message: " + e.getMessage());
         return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e) {
-        LOGGER.error("Attempted operation not allowed. Message: " + e.getMessage());
+        log.error("Attempted operation not allowed. Message: " + e.getMessage());
         return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

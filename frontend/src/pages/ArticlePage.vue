@@ -1,58 +1,151 @@
 <template>
-  <h1>Create or update article</h1>
-  <article-form v-bind:article="article" v-if="visibleForm" @form-submitted="visibleForm = false"/>
-
-  <button type="button" @click="subscribe(article.author.id)">Subscribe</button>
-  <button type="button" @click="deleteArticle(article.id)">Delete</button>
-  <button type="button" @click="editArticle()">Edit</button>
-
-  <div>{{ article.id }}</div>
-  <div>{{ article.title }}</div>
-  <div>{{ article.content }}</div>
-  <div>
-    <div v-for="(imageLink, index) in article.imageLinks" :key="index">
-      <img :src="getImagePath(imageLink)" alt="Article Image">
+  <div class="alert-holder">
+    <div class="alert alert-danger" role="alert" v-for="(error, index) in errors" :key="index" v-bind:class="{ 'show': errors.length }">
+      {{ error.message }}
     </div>
   </div>
-  <div>{{ article.author.name }}</div>
-  <div>{{ article.creationDate }}</div>
+  <main class="container">
+    <div v-if="visibleForm">
+      <article-form v-bind:selected-article="article"  @form-submitted="visibleForm = false"/>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center my-2" role="group"
+         aria-label="Basic mixed styles example" v-if="isAuthor">
+      <div>
+        <button type="button" class="btn btn-outline-danger" @click="deleteArticle(article.id)">Delete article</button>
+        <button type="button" class="btn btn-outline-primary mx-2" @click="editArticle()">Edit article</button>
+      </div>
+    </div>
+
+    <div class="card text-center bg-card" v-if="article">
+      <div class="card-header bg-card">
+        <div id="carousel" class="carousel slide" v-if="showCarousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active image-container" v-for="(imageLink, index) in article.imageLinks" :key="index">
+              <img :src="getImagePath(imageLink)" class="d-block w-100" alt="Article Image">
+            </div>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon arrow" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+            <span class="carousel-control-next-icon arrow" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">{{ article.title }}</h5>
+        <p class="card-text">{{ article.content }}</p>
+        <a href="#" class="btn btn-link text-without-underline" v-on:click="openAuthorProfile(article.author.id)">{{ article.author.name }}</a>
+      </div>
+      <div class="card-footer text-body-secondary bg-card">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <input type="button" value="Comments" v-on:click="openComments(article.id)"
+                   class="btn btn-outline-primary"/>
+          </div>
+          <div class="w-100" v-on:click="likeArticle(article.id)">
+            <font-awesome-icon :icon="['fas', 'heart']" size="2xl" style="color: #3e6cf4;" class="heart" v-if="articleLiked"/>
+            <font-awesome-icon :icon="['far', 'heart']" size="2xl" style="color: #3e6cf4;" class="heart" v-else/>
+            <span>{{ articleLikes }}</span>
+          </div>
+          <small class="text-body-secondary">{{ formatDateTime(article.creationDate) }}</small>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div class="container" v-if="commentsOpen">
+    <div class="card my-3 p-3 bg-body rounded shadow-sm">
+      <h5 class="border-bottom pb-2 mb-0 text-md-start">Comments</h5>
+      <div class="d-flex text-body-secondary pt-3" v-for="comment in comments" :key="comment.id">
+        <img :src="getImagePath(comment.author.userPicture)" class="bd-placeholder-img flex-shrink-0 me-2 rounded" style="width: 50px; height: 50px;">
+        <p class="pb-3 mb-0 lh-sm border-bottom text-md-start">
+          <strong class="d-block text-gray-dark">{{ comment.author.name }}</strong>
+          {{ comment.comment }}
+        </p>
+      </div>
+      <hr>
+      <div class="d-flex text-body-secondary pt-3">
+        <textarea class="form-control" rows="2" v-model="newComment"></textarea>
+        <input type="button" value="Submit сomment" v-on:click="submitComment(article.id)"
+               class="btn btn-outline-primary" style="height: 40px; margin-left: 25px;"/>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script>
 import {AXIOS} from "@/http-commons";
 import ArticleForm from "@/components/ArticleForm.vue";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome"
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+
+library.add(fas, far)
 
 export default {
-  components: {ArticleForm},
+  components: {ArticleForm, FontAwesomeIcon},
   data() {
     return {
-      article: {
-        id: 1,
-        author: {
-          name: "ppp"
-        }
-      },
+      errors: [],
+      article: null,
+      comments: [],
+      newComment: '',
       visibleForm: false,
+      showCarousel: true,
+      articleLiked: false,
+      commentsOpen: false,
+      isAuthor: false,
+      articleLikes: 24,
     }
-  },
-  mounted() {
-    const articleId = this.$route.query.id;
-    this.getArticle(articleId);
   },
   methods: {
     getArticle(articleId) {
-      console.log(articleId)
-    },
-    subscribe(id) {
-      AXIOS.post(`/profile/subscriptions/${id}`, {}, {params: {subscriptionStatus: true}})
+      AXIOS.get(`/articles/${articleId}`)
           .then(response => {
-            this.responseMessages = response.data.message
+            this.article = response.data
+            this.showCarousel = this.article.imageLinks.length > 0
           })
           .catch(error => {
-            if (!Array.isArray(error.response.data)) {
-              this.errors.push(error.response.data)
-            }
+            this.handleError(error)
           })
+    },
+    openComments(articleId) {
+      AXIOS.get(`/comments/${articleId}`)
+          .then(response => {
+            this.comments = response.data
+          })
+          .catch(error => {
+            this.handleError(error)
+          })
+      this.commentsOpen = !this.commentsOpen
+    },
+    submitComment(articleId) {
+      AXIOS.post(`/comments/${articleId}`, {newComment: this.newComment})
+          .then(response => {
+            let index = this.comments.findIndex(item => item.id === response.data.id)
+            this.comments.splice(index, 1, response.data);
+          })
+          .catch(error => {
+            this.handleError(error)
+          })
+    },
+    likeArticle(articleId) {
+      console.log(articleId)
+      if (this.articleLiked) {
+        this.articleLiked = false
+        this.articleLikes--
+      } else {
+        this.articleLiked = true
+        this.articleLikes++
+      }
+    },
+    openAuthorProfile(authorId) {
+      this.$router.push({name: 'ProfileComponent', params: {id: authorId}});
     },
     deleteArticle(id) {
       AXIOS.delete(`/articles/${id}`)
@@ -60,15 +153,11 @@ export default {
             this.responseMessages = response.data.message
           })
           .catch(error => {
-            if (Array.isArray(error.response.data)) {
-              this.errors = error.response.data
-            } else {
-              this.errors.push(error.response.data)
-            }
+            this.handleError(error)
           })
     },
     editArticle() {
-      this.visibleForm = true
+      this.visibleForm = !this.visibleForm
     },
     getImagePath(link) {
       if (link) {
@@ -80,11 +169,72 @@ export default {
       }
 
       return 'https://via.placeholder.com/150';
+    },
+    formatDateTime(dateTimeString) {
+      const options = { day: 'numeric', month: 'long', hour: 'numeric', minute: 'numeric' };
+      const dateTime = new Date(dateTimeString);
+      const date = dateTime.toLocaleDateString('en-US', options);
+      return `${date}`;
+    },
+    handleError(error) {
+      if (!Array.isArray(error.response.data)) {
+        this.errors.push(error.response.data)
+      }
+
+      setTimeout(() => {
+        this.errors = [];
+      }, 5000)
+    },
+    isAuthor() {
+      if (this.article) {
+        return this.$store.getters.getId === this.article.author.id
+      }
+
+      return true
+    },
+  },
+  mounted() {
+    const articleId = this.$route.params.id;
+    if (articleId) {
+      this.getArticle(articleId);
     }
-  }
+
+    this.isAuthor()
+  },
 }
 </script>
 
 <style>
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 500px;
+}
 
+.image-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.arrow {
+  background-color:#007bff;
+}
+
+.bg-card {
+  background-color:white;
+}
+
+.heart {
+  margin-right: 5px;
+}
+
+.text-without-underline {
+  text-decoration: none;
+}
+
+.comments-title {
+
+}
 </style>

@@ -11,6 +11,7 @@ import com.example.backend.security.UserDetailsImpl;
 import com.example.backend.security.jwt.JwtUtils;
 import com.example.backend.service.MailSenderService;
 import com.example.backend.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ import java.security.InvalidParameterException;
 
 @RestController
 @RequestMapping("/api/auth")
+@Slf4j
 public class AuthController {
     private final UserService userService;
     private final JwtUtils jwtUtils;
@@ -57,9 +59,11 @@ public class AuthController {
             throw new InvalidParameterException("Login user can not be null");
         }
 
+        User user =  userService.findUserByEmail(loginUserDto.getEmail());
+
         authenticateUser(loginUserDto.getEmail(), loginUserDto.getPassword(), response);
 
-        User user =  userService.findUserByEmail(loginUserDto.getEmail());
+        log.info("User authenticated");
 
         UserDto userDto = new UserDto(user);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
@@ -78,6 +82,8 @@ public class AuthController {
 
         mailSenderService.sendMessageOnUserEmail(user, SUBJECT, MESSAGE);
 
+        log.info("New user registered, waiting email confirmation");
+
         return new ResponseEntity<>(new ResponseMessage("Confirm email sent successfully, waiting confirmation"), HttpStatus.OK);
     }
 
@@ -91,6 +97,8 @@ public class AuthController {
     @GetMapping("/oauth2-success")
     public ResponseEntity<?> oauth2Success(@AuthenticationPrincipal UserDetailsImpl authenticatedUser) {
         User user = userService.getUserFromUserDetails(authenticatedUser);
+
+        log.info("User authenticated with oauth2 successfully");
 
         UserDto userDto = new UserDto(user);
         return new ResponseEntity<>(userDto, HttpStatus.OK);

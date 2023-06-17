@@ -58,6 +58,7 @@ export default {
               roles: response.data.roles,
               name: response.data.name,
               picture: response.data.userPicture,
+              id: response.data.id
             })
 
             this.$router.push('/profile')

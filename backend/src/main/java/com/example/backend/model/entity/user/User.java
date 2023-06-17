@@ -1,6 +1,7 @@
 package com.example.backend.model.entity.user;
 
 import com.example.backend.model.entity.article.Article;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
+@Data
 public class User {
 
     @Id
@@ -78,118 +80,6 @@ public class User {
         this.provider = provider;
         this.status = status;
         this.roles = roles;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUserPicture() {
-        return userPicture;
-    }
-
-    public void setUserPicture(String userPicture) {
-        this.userPicture = userPicture;
-    }
-
-    public String getLocale() {
-        return locale;
-    }
-
-    public void setLocale(String local) {
-        this.locale = local;
-    }
-
-    public Provider getProvider() {
-        return provider;
-    }
-
-    public void setProvider(Provider provider) {
-        this.provider = provider;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
-    public Set<UserSubscription> getSubscriptions() {
-        return subscriptions;
-    }
-
-    public void setSubscriptions(Set<UserSubscription> subscriptions) {
-        this.subscriptions = subscriptions;
-    }
-
-    public Set<UserSubscription> getSubscribers() {
-        return subscribers;
-    }
-
-    public void setSubscribers(Set<UserSubscription> subscribers) {
-        this.subscribers = subscribers;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public String getActivationCode() {
-        return activationCode;
-    }
-
-    public void setActivationCode(String activationCode) {
-        this.activationCode = activationCode;
-    }
-
-    public List<Article> getArticles() {
-        return articles;
-    }
-
-    public void setArticles(List<Article> articles) {
-        this.articles = articles;
     }
 
     @Override
