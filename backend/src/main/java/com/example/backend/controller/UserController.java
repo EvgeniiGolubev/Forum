@@ -78,7 +78,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
-        return new ResponseEntity<>(new ResponseMessage("User deleted successfully"), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/change-password/{id}")
@@ -96,7 +96,7 @@ public class UserController {
 
         mailSenderService.sendMessageOnUserEmail(changeUser, SUBJECT, MESSAGE + password);
 
-        return new ResponseEntity<>(new ResponseMessage("User password changed"), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/change-status/{id}")
@@ -112,7 +112,7 @@ public class UserController {
         checkAccess(changeUser, user);
 
         userService.changeUserStatus(changeUser, isBanned);
-        return new ResponseEntity<>(new ResponseMessage("User's status changed successfully"), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/change-moderator-role/{id}")
@@ -129,11 +129,7 @@ public class UserController {
 
         userService.changeUserModeratorRole(changeUser, isModer);
 
-        if (isModer) {
-            return new ResponseEntity<>(new ResponseMessage("User now is moderator"), HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(new ResponseMessage("User is no longer a moderator"), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private void checkAccess(User changeUser, User user) throws AccessDeniedException {

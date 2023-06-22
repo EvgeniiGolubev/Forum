@@ -60,7 +60,7 @@ public class ArticleController {
         User author = userService.getUserFromUserDetails(authenticatedUser);
 
         ArticleDto article = articleService.createArticle(author, articleDto, images);
-        return new ResponseEntity<>(article, HttpStatus.OK);
+        return new ResponseEntity<>(article, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasAuthority('USER')")
@@ -92,7 +92,14 @@ public class ArticleController {
         checkAccess(actualAuthor, author);
 
         articleService.deleteArticle(id, author);
-        return new ResponseEntity<>("Article delete successfully", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @DeleteMapping("/delete-image/{id}")
+    public ResponseEntity<?> deleteArticleImageLink(@PathVariable("id") Long id, @RequestParam String imageLink) {
+        articleService.deleteArticleImageLink(id, imageLink);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private void checkAccess(User actualAuthor, User author) throws AccessDeniedException {

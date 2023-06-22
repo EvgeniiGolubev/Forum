@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: 'Forum'
+
   datasource:
     url: jdbc:mysql://localhost:3306/forum
     username: ${username}
@@ -6,7 +9,7 @@ spring:
 
   jpa:
     generate-ddl: true
-    show-sql: false
+    show-sql: true
 
   security:
     oauth2:
@@ -38,3 +41,12 @@ upload:
   path: ${path}
 
 hostname: localhost:8080
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'

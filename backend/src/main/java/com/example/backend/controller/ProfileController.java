@@ -87,7 +87,7 @@ public class ProfileController {
 
         logout(response);
 
-        return new ResponseEntity<>(new ResponseMessage("User profile successfully deleted"), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/subscriptions")
@@ -108,7 +108,7 @@ public class ProfileController {
         User subscriber = userService.getUserFromUserDetails(authenticatedUser);
 
         profileService.changeSubscription(channel, subscriber, subscriptionStatus);
-        return new ResponseEntity<>("Subscription status changed successfully", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/subscribers")
@@ -129,7 +129,7 @@ public class ProfileController {
         User subscriber = userService.findUserById(subscriberId);
 
         profileService.changeSubscriberStatus(subscriber, channel, subscriberStatus);
-        return new ResponseEntity<>("Subscriber status changed successfully", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/change-email")
@@ -149,10 +149,7 @@ public class ProfileController {
 
         logout(response);
 
-        return new ResponseEntity<>(
-                new ResponseMessage("User logged out. Email successfully sent, waiting for confirmation"),
-                HttpStatus.OK
-        );
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/change-password")
@@ -171,7 +168,7 @@ public class ProfileController {
 
         logout(response);
 
-        return new ResponseEntity<>(new ResponseMessage("User logged out. Password successfully changed"), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private void logout(HttpServletResponse response) {

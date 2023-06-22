@@ -122,6 +122,20 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public void deleteArticleImageLink(Long id, String imageLink) throws IllegalArgumentException {
+        if (imageLink == null) {
+            throw new IllegalArgumentException("Image link cannot be null");
+        }
+
+        Article article = checkArticlePresentAndGet(id);
+
+        fileManagerUtil.deleteFiles(List.of(imageLink));
+        article.getImageLinks().remove(imageLink);
+
+        articleRepository.save(article);
+    }
+
+    @Override
     public User getArticleAuthorByArticleId(Long id) throws IllegalArgumentException {
         Article article = checkArticlePresentAndGet(id);
         return article.getAuthor();

@@ -2,6 +2,8 @@ package com.example.backend.model.entity.article;
 
 import com.example.backend.model.entity.user.User;
 import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -29,7 +31,8 @@ public class Article {
     @Column(name="creation_date", updatable = false)
     private LocalDateTime creationDate;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
+    @Fetch(FetchMode.JOIN)
     @Column(name = "image_links")
     private List<String> imageLinks = new ArrayList<>();
 

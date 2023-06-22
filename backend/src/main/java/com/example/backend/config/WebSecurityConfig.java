@@ -1,5 +1,6 @@
 package com.example.backend.config;
 
+import com.example.backend.model.entity.user.Role;
 import com.example.backend.security.jwt.JwtTokenFilter;
 import com.example.backend.security.jwt.JwtUtils;
 import com.example.backend.security.oauth2.CustomOAuth2UserService;
@@ -59,6 +60,7 @@ public class WebSecurityConfig {
                 .cors().configurationSource(corsConfigurationSource())
                 .and()
                     .authorizeRequests()
+                    .antMatchers("/actuator/**").hasAuthority(Role.ADMIN.name())
                     .antMatchers("/", "/img/*", "/login**", "/registration**", "/static/**",
                         "/error**", "/api/articles/**", "/api/auth/**", "/confirm-email").permitAll()
                     .anyRequest().authenticated()

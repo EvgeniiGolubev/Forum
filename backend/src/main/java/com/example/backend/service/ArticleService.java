@@ -26,4 +26,6 @@ public interface ArticleService {
 
     Page<ArticleDto> getArticlesBySubscription(User user, String sortType, int page, int pageSize)
             throws IllegalArgumentException;
+
+    void deleteArticleImageLink(Long id, String imageLink) throws IllegalArgumentException;
 }

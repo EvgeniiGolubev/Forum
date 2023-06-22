@@ -1,12 +1,9 @@
 <template>
-  <div class="alert-holder">
-    <div class="alert alert-danger" role="alert" v-for="(error, index) in errors" :key="index" v-bind:class="{ 'show': errors.length }">
-      {{ error.message }}
-    </div>
-  </div>
+  <errors-view v-bind:errors="errors"/>
+
   <main class="container">
     <div v-if="visibleForm">
-      <article-form v-bind:selected-article="article"  @form-submitted="visibleForm = false"/>
+      <article-form v-bind:selected-article="article"  @form-submitted="reloadPage"/>
     </div>
 
     <div class="d-flex justify-content-between align-items-center my-2" role="group"
@@ -21,15 +18,15 @@
       <div class="card-header bg-card">
         <div id="carousel" class="carousel slide" v-if="showCarousel">
           <div class="carousel-inner">
-            <div class="carousel-item active image-container" v-for="(imageLink, index) in article.imageLinks" :key="index">
-              <img :src="getImagePath(imageLink)" class="d-block w-100" alt="Article Image">
+            <div v-for="(imageLink, index) in article.imageLinks" :key="index" :class="['carousel-item', index === 0 ? 'active' : '']" style="height: 500px;">
+              <img :src="getImagePath(imageLink)" class="d-block w-100 image-container" alt="Article Image">
             </div>
           </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+          <button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon arrow" aria-hidden="true"></span>
             <span class="visually-hidden">Previous</span>
           </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+          <button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
             <span class="carousel-control-next-icon arrow" aria-hidden="true"></span>
             <span class="visually-hidden">Next</span>
           </button>
@@ -37,7 +34,7 @@
       </div>
       <div class="card-body">
         <h5 class="card-title">{{ article.title }}</h5>
-        <p class="card-text">{{ article.content }}</p>
+        <p class="card-text text-md-start">{{ article.content }}</p>
         <a href="#" class="btn btn-link text-without-underline" v-on:click="openAuthorProfile(article.author.id)">{{ article.author.name }}</a>
       </div>
       <div class="card-footer text-body-secondary bg-card">
@@ -84,15 +81,31 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome"
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
+import ErrorsView from "@/components/ErrorsView.vue";
 
 library.add(fas, far)
 
 export default {
-  components: {ArticleForm, FontAwesomeIcon},
+  components: {ErrorsView, ArticleForm, FontAwesomeIcon},
   data() {
     return {
       errors: [],
-      article: null,
+      article: {
+        "id": 8,
+        "title": "dsdxcascascassss",
+        "content": "asxdffgsfgsdvsdvase adfasd asfasf as fas fawfw awfqwwf asf asf as faw",
+        "author": {
+          "id": 3,
+          "name": "biba",
+          "userPicture": "https://via.placeholder.com/50"
+        },
+        "creationDate": "2023-06-12 16:04:43",
+        "imageLinks": [
+          "https://via.placeholder.com/150",
+          "https://via.placeholder.com/150",
+          "https://via.placeholder.com/150",
+        ]
+      },
       comments: [],
       newComment: '',
       visibleForm: false,
@@ -101,6 +114,7 @@ export default {
       commentsOpen: false,
       isAuthor: false,
       articleLikes: 24,
+      articleId: 0,
     }
   },
   methods: {
@@ -160,7 +174,7 @@ export default {
       this.visibleForm = !this.visibleForm
     },
     getImagePath(link) {
-      if (link) {
+      if (link && typeof link === 'string') {
         if (link.startsWith('https://')) {
           return link
         } else {
@@ -180,39 +194,32 @@ export default {
       if (!Array.isArray(error.response.data)) {
         this.errors.push(error.response.data)
       }
-
-      setTimeout(() => {
-        this.errors = [];
-      }, 5000)
     },
-    isAuthor() {
+    isAuthorCheck() {
       if (this.article) {
-        return this.$store.getters.getId === this.article.author.id
+        this.isAuthor = this.$store.getters.getId === this.article.author.id
       }
 
-      return true
+      this.isAuthor = true
     },
+    reloadPage() {
+      this.visibleForm = false
+    }
   },
   mounted() {
     const articleId = this.$route.params.id;
     if (articleId) {
+      this.articleId = articleId
       this.getArticle(articleId);
     }
 
-    this.isAuthor()
+    this.isAuthorCheck()
   },
 }
 </script>
 
 <style>
 .image-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 500px;
-}
-
-.image-container img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
@@ -232,9 +239,5 @@ export default {
 
 .text-without-underline {
   text-decoration: none;
-}
-
-.comments-title {
-
 }
 </style>

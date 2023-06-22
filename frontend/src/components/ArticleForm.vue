@@ -1,9 +1,5 @@
 <template>
-  <div class="alert-holder">
-    <div class="alert alert-danger" role="alert" v-for="(error, index) in errors" :key="index" v-bind:class="{ 'show': errors.length }">
-      {{ error.message }}
-    </div>
-  </div>
+  <errors-view v-bind:errors="errors"/>
 
   <div class="card text-center bg-card">
     <form ref="form" @submit.prevent="submitForm" class="needs-validation m-3" novalidate>
@@ -20,6 +16,14 @@
       <div class="mt-3">
         <input class="form-control" type="file" multiple @change="handleFileChange">
       </div>
+      <div class="container mt-3" v-if="imageLinks">
+        <div class="row align-items-center">
+          <div class="card" style="width: 12rem; padding: 20px; margin: 5px;" v-for="(image, index) in imageLinks" :key="index">
+            <img :src="getImagePath(image)" class="bd-placeholder-img flex-shrink-0 me-2 rounded image-container" style="width: 150px; height: 150px;">
+            <button class="btn btn-danger" style="position: absolute; left: 0; top: 0;" @click.prevent="deleteImage(image)">X</button>
+          </div>
+        </div>
+      </div>
       <div class="d-flex justify-content-between mt-3">
         <button class="btn btn-primary" style="width: 100px;">{{ buttonLabel }}</button>
       </div>
@@ -29,39 +33,19 @@
 
 <script>
 import {AXIOS} from "@/http-commons";
+import ErrorsView from "@/components/ErrorsView.vue";
 
 export default {
+  components: { ErrorsView },
   props: ['selectedArticle'],
   data() {
     return {
       id: '',
       title: '',
       content: '',
-      images: [],
+      imageLinks: [],
       errors: [],
     }
-  },
-  mounted() {
-    if (this.selectedArticle) {
-      this.id = this.selectedArticle.id
-      this.title = this.selectedArticle.title
-      this.content = this.selectedArticle.content
-      if (this.selectedArticle.images) {
-        this.images = this.selectedArticle.images
-      }
-    }
-
-    const forms = document.querySelectorAll('.needs-validation');
-    Array.from(forms).forEach(form => {
-      form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-
-        form.classList.add('was-validated');
-      }, false);
-    });
   },
   computed: {
     buttonLabel() {
@@ -70,11 +54,13 @@ export default {
   },
   methods: {
     submitForm() {
+      this.errors = []
+
       const formData = new FormData();
       formData.append('title', this.title);
       formData.append('content', this.content);
-      for (let i = 0; i < this.images.length; i++) {
-        formData.append('images', this.images[i]);
+      for (let i = 0; i < this.imageLinks.length; i++) {
+        formData.append('images', this.imageLinks[i]);
       }
 
       const headers = {
@@ -85,6 +71,7 @@ export default {
         AXIOS.put(`/articles/${this.id}`, formData, { headers: headers })
             .then(response => {
               console.log(response.data)
+              this.$emit('form-submitted');
             })
             .catch(error => {
               this.handleError(error)
@@ -98,31 +85,67 @@ export default {
               this.handleError(error)
             })
       }
-
-      if (this.errors.length === 0) {
-        this.id = ''
-        this.title = ''
-        this.content = ''
-        this.images = []
-        this.$emit('form-submitted');
-      }
     },
     handleFileChange(event) {
       for (let file of event.target.files) {
-        this.images.push(file)
+        this.imageLinks.push(file)
       }
-      // this.images.push(event.target.files[0]);
+    },
+    deleteImage(link) {
+      AXIOS.delete(`/articles/delete-image/${this.id}`, {params: {imageLink: link}})
+          .then(response => {
+            const index = this.imageLinks.indexOf(link);
+            if (index > -1) {
+              this.imageLinks.splice(index, 1);
+            }
+
+            console.log(response)
+          })
+          .catch(error => {
+            this.handleError(error)
+          })
     },
     handleError(error) {
       if (!Array.isArray(error.response.data)) {
-        this.errors.push(error.response.data)
+        this.errors.push(error.response.data.message)
       }
+    },
+    getImagePath(link) {
+      if (!link) return '/img/icon/paw.png'
 
-      setTimeout(() => {
-        this.errors = [];
-      }, 5000)
+      if (typeof link === 'string') {
+        if (link.startsWith('https://')) {
+          return link
+        } else {
+          return `/img/${link}`
+        }
+      } else {
+        return URL.createObjectURL(link)
+      }
     }
-  }
+  },
+  mounted() {
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        form.classList.add('was-validated');
+      }, false);
+    });
+
+    if (this.selectedArticle) {
+      this.id = this.selectedArticle.id
+      this.title = this.selectedArticle.title
+      this.content = this.selectedArticle.content
+      if (this.selectedArticle.imageLinks) {
+        this.imageLinks = this.selectedArticle.imageLinks
+      }
+    }
+  },
 }
 </script>
 

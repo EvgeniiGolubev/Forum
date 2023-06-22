@@ -80,6 +80,9 @@ const mutations = {
         localStorage.removeItem("user-name")
         localStorage.removeItem("user-picture")
         localStorage.removeItem("user-id")
+    },
+    changeNameMutation: (state, name) => {
+        state.name = name
     }
 }
 
@@ -89,6 +92,9 @@ const actions = {
     },
     logoutAction: (context) => {
         context.commit('logoutMutation')
+    },
+    changeNameAction: (context, name) => {
+        context.commit('changeNameMutation', name)
     }
 }
 

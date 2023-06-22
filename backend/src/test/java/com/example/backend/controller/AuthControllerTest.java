@@ -109,7 +109,7 @@ class AuthControllerTest {
 
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
 
-        ResponseEntity<?> responseEntity = authController.registerUser(newUserDto, response);
+        ResponseEntity<?> responseEntity = authController.registerUser(newUserDto);
 
         assertThat(violations).isEmpty();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -120,7 +120,7 @@ class AuthControllerTest {
     void registerUserIfNewUserDtoIsNull() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> authController.registerUser(null, response)
+                () -> authController.registerUser(null)
         );
 
         assertEquals("New user can not be null", exception.getMessage());

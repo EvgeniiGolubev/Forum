@@ -1,9 +1,5 @@
 <template>
-  <div class="alert-holder">
-    <div class="alert alert-danger" role="alert" v-for="(error, index) in errors" :key="index" v-bind:class="{ 'show': errors.length }">
-      {{ error.message }}
-    </div>
-  </div>
+  <errors-view v-bind:errors="errors"/>
 
   <main class="form-signin">
     <div class="container">
@@ -34,8 +30,10 @@
 
 <script>
 import {AXIOS} from "@/http-commons";
+import ErrorsView from "@/components/ErrorsView.vue";
 
 export default {
+  components: { ErrorsView },
   data() {
     return {
       email: '',
@@ -67,10 +65,6 @@ export default {
             if (!Array.isArray(error.response.data)) {
               this.errors.push(error.response.data)
             }
-
-            setTimeout(() => {
-              this.errors = [];
-            }, 5000)
           })
     },
     toRegistration() {
@@ -97,18 +91,5 @@ export default {
 .form-signin {
   max-width: 400px;
   margin: 0 auto;
-}
-.alert-holder {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.alert {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.alert.show {
-  opacity: 1;
 }
 </style>

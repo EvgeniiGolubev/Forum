@@ -70,7 +70,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody NewUserDto newUserDto, HttpServletResponse response) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody NewUserDto newUserDto) {
         if (newUserDto == null) {
             throw new InvalidParameterException("New user can not be null");
         }
@@ -84,14 +84,15 @@ public class AuthController {
 
         log.info("New user registered, waiting email confirmation");
 
-        return new ResponseEntity<>(new ResponseMessage("Confirm email sent successfully, waiting confirmation"), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/confirm-email")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> activateUserAccount(@RequestBody ConfirmEmailRequest request)  {
         userService.activateUserEmail(request.getCode());
 
-        return new ResponseEntity<>(new ResponseMessage("Email confirm successfully"), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/oauth2-success")
