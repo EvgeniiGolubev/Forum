@@ -2,7 +2,7 @@
   <errors-view v-bind:errors="errors"/>
 
   <div class="card text-center bg-card">
-    <form ref="form" @submit.prevent="submitForm" class="needs-validation m-3" novalidate>
+    <form ref="form" @submit="submitForm" class="needs-validation m-3" novalidate>
       <div class="form-floating">
         <input type="text" class="form-control" id="floatingInput" v-model="title" required>
         <label for="floatingInput">Title</label>
@@ -14,13 +14,30 @@
         <div class="invalid-feedback">Content can not be empty.</div>
       </div>
       <div class="mt-3">
-        <input class="form-control" type="file" multiple @change="handleFileChange">
+        <div class="container">
+          <p class="text-md-start">Maximum photo size 5Mb</p>
+        </div>
       </div>
       <div class="container mt-3" v-if="imageLinks">
         <div class="row align-items-center">
-          <div class="card" style="width: 12rem; padding: 20px; margin: 5px;" v-for="(image, index) in imageLinks" :key="index">
-            <img :src="getImagePath(image)" class="bd-placeholder-img flex-shrink-0 me-2 rounded image-container" style="width: 150px; height: 150px;">
-            <button class="btn btn-danger" style="position: absolute; left: 0; top: 0;" @click.prevent="deleteImage(image)">X</button>
+          <div class="card image-holder" v-for="(image, index) in imageLinks" :key="index">
+            <img :src="getImagePath(image)" class="bd-placeholder-img flex-shrink-0 me-2 rounded image-container img-preview">
+            <button class="btn btn-danger btn-delete" @click.prevent="deleteImage(image)">X</button>
+          </div>
+          <div class="card image-holder" v-for="(image, index) in newImages" :key="index">
+            <div class="spinner-border text-primary spinner" role="status" v-if="spinnerVisible">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <img :src="getImagePath(image)" class="bd-placeholder-img flex-shrink-0 me-2 rounded image-container img-preview">
+            <button class="btn btn-danger btn-delete" @click.prevent="deleteImage(image)">X</button>
+          </div>
+          <div class="file-upload"  v-if="imageLinks.length < 6">
+            <label for="file-input">
+              <div class="card upload-box">
+                <font-awesome-icon :icon="['fas', 'plus']" size="2xl" style="color: #3e6cf4;"/>
+              </div>
+            </label>
+            <input id="file-input" class="form-control" type="file" @change="handleFileChange" style="display: none"/>
           </div>
         </div>
       </div>
@@ -34,9 +51,16 @@
 <script>
 import {AXIOS} from "@/http-commons";
 import ErrorsView from "@/components/ErrorsView.vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+
+library.add(fas, far)
 
 export default {
-  components: { ErrorsView },
+  components: {FontAwesomeIcon, ErrorsView },
+  emits: ['formSubmitted'],
   props: ['selectedArticle'],
   data() {
     return {
@@ -44,7 +68,9 @@ export default {
       title: '',
       content: '',
       imageLinks: [],
+      newImages: [],
       errors: [],
+      spinnerVisible: false,
     }
   },
   computed: {
@@ -53,14 +79,26 @@ export default {
     }
   },
   methods: {
-    submitForm() {
-      this.errors = []
+    submitForm(event) {
+      event.preventDefault()
+
+      const form = this.$refs.form;
+      if (!form.checkValidity()) {
+        return;
+      }
+
+      this.spinnerVisible = true
 
       const formData = new FormData();
       formData.append('title', this.title);
       formData.append('content', this.content);
+
       for (let i = 0; i < this.imageLinks.length; i++) {
-        formData.append('images', this.imageLinks[i]);
+        formData.append('imageLinks', this.imageLinks[i]);
+      }
+
+      for (let i = 0; i < this.newImages.length; i++) {
+        formData.append('newImages', this.newImages[i]);
       }
 
       const headers = {
@@ -70,8 +108,8 @@ export default {
       if (this.id) {
         AXIOS.put(`/articles/${this.id}`, formData, { headers: headers })
             .then(response => {
-              console.log(response.data)
-              this.$emit('form-submitted');
+              this.spinnerVisible = false
+              this.$emit('formSubmitted', response.data.id);
             })
             .catch(error => {
               this.handleError(error)
@@ -79,7 +117,8 @@ export default {
       } else {
         AXIOS.post(`/articles`, formData, { headers: headers })
             .then(response => {
-              console.log(response.data)
+              this.spinnerVisible = false
+              this.$emit('formSubmitted', response.data.id);
             })
             .catch(error => {
               this.handleError(error)
@@ -87,40 +126,53 @@ export default {
       }
     },
     handleFileChange(event) {
+      const maxFileSize = 5 * 1024 * 1024; // Максимальный размер файла (5 МБ)
+
       for (let file of event.target.files) {
-        this.imageLinks.push(file)
-      }
-    },
-    deleteImage(link) {
-      AXIOS.delete(`/articles/delete-image/${this.id}`, {params: {imageLink: link}})
-          .then(response => {
-            const index = this.imageLinks.indexOf(link);
-            if (index > -1) {
-              this.imageLinks.splice(index, 1);
-            }
-
-            console.log(response)
-          })
-          .catch(error => {
-            this.handleError(error)
-          })
-    },
-    handleError(error) {
-      if (!Array.isArray(error.response.data)) {
-        this.errors.push(error.response.data.message)
-      }
-    },
-    getImagePath(link) {
-      if (!link) return '/img/icon/paw.png'
-
-      if (typeof link === 'string') {
-        if (link.startsWith('https://')) {
-          return link
+        if (file.size > maxFileSize) {
+          this.errors.push({ message: 'The maximum photo size has been exceeded!' })
+          return;
         } else {
-          return `/img/${link}`
+          this.newImages.push(file);
+        }
+      }
+    },
+    deleteImage(image) {
+      if (!image) return
+
+      if (typeof image === 'string') {
+        const index = this.imageLinks.indexOf(image);
+        if (index > -1) {
+          this.imageLinks.splice(index, 1);
         }
       } else {
-        return URL.createObjectURL(link)
+        const index = this.newImages.indexOf(image);
+        if (index > -1) {
+          this.newImages.splice(index, 1);
+        }
+      }
+
+    },
+    handleError(error) {
+      this.spinnerVisible = false
+
+      if (error) {
+        if (!Array.isArray(error.response.data)) {
+          this.errors.push(error.response.data)
+        }
+      }
+    },
+    getImagePath(image) {
+      if (!image) return '/img/icon/paw.png'
+
+      if (typeof image === 'string') {
+        if (image.startsWith('https://')) {
+          return image
+        } else {
+          return `/img/${image}`
+        }
+      } else {
+        return URL.createObjectURL(image)
       }
     }
   },
@@ -150,5 +202,46 @@ export default {
 </script>
 
 <style>
+.file-upload {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
 
+.upload-box,
+.image-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  position: absolute;
+  right: 35px;
+  bottom: 35px;
+  width: 80px;
+  height: 80px;
+}
+
+.image-holder {
+  width: 150px;
+  height: 150px;
+  margin: 5px;
+}
+
+.img-preview {
+  width: 150px;
+  height: 150px;
+}
+
+.btn-delete {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
 </style>

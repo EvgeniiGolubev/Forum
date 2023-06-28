@@ -7,7 +7,7 @@
     </div>
 
     <div class="d-flex justify-content-between align-items-center my-2" role="group"
-         aria-label="Basic mixed styles example" v-if="isAuthor">
+         aria-label="Basic mixed styles example" v-if="isAuthor && article">
       <div>
         <button type="button" class="btn btn-outline-danger" @click="deleteArticle(article.id)">Delete article</button>
         <button type="button" class="btn btn-outline-primary mx-2" @click="editArticle()">Edit article</button>
@@ -90,22 +90,7 @@ export default {
   data() {
     return {
       errors: [],
-      article: {
-        "id": 8,
-        "title": "dsdxcascascassss",
-        "content": "asxdffgsfgsdvsdvase adfasd asfasf as fas fawfw awfqwwf asf asf as faw",
-        "author": {
-          "id": 3,
-          "name": "biba",
-          "userPicture": "https://via.placeholder.com/50"
-        },
-        "creationDate": "2023-06-12 16:04:43",
-        "imageLinks": [
-          "https://via.placeholder.com/150",
-          "https://via.placeholder.com/150",
-          "https://via.placeholder.com/150",
-        ]
-      },
+      article: null,
       comments: [],
       newComment: '',
       visibleForm: false,
@@ -150,6 +135,7 @@ export default {
     },
     likeArticle(articleId) {
       console.log(articleId)
+
       if (this.articleLiked) {
         this.articleLiked = false
         this.articleLikes--
@@ -164,7 +150,8 @@ export default {
     deleteArticle(id) {
       AXIOS.delete(`/articles/${id}`)
           .then(response => {
-            this.responseMessages = response.data.message
+            console.log(response)
+            this.$router.push("/")
           })
           .catch(error => {
             this.handleError(error)
@@ -182,7 +169,7 @@ export default {
         }
       }
 
-      return 'https://via.placeholder.com/150';
+      return '/img/icon/paw.png';
     },
     formatDateTime(dateTimeString) {
       const options = { day: 'numeric', month: 'long', hour: 'numeric', minute: 'numeric' };
@@ -198,12 +185,14 @@ export default {
     isAuthorCheck() {
       if (this.article) {
         this.isAuthor = this.$store.getters.getId === this.article.author.id
+      } else {
+        this.isAuthor = true
       }
-
-      this.isAuthor = true
     },
-    reloadPage() {
+    reloadPage(id) {
       this.visibleForm = false
+      this.articleId = id
+      this.getArticle(id)
     }
   },
   mounted() {
@@ -211,6 +200,8 @@ export default {
     if (articleId) {
       this.articleId = articleId
       this.getArticle(articleId);
+    } else {
+      this.visibleForm = true
     }
 
     this.isAuthorCheck()

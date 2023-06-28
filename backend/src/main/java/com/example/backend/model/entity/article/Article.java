@@ -32,7 +32,6 @@ public class Article {
     private LocalDateTime creationDate;
 
     @ElementCollection
-    @Fetch(FetchMode.JOIN)
     @Column(name = "image_links")
     private List<String> imageLinks = new ArrayList<>();
 

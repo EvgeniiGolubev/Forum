@@ -6,7 +6,6 @@ import com.example.backend.model.dto.article.ArticleDto;
 import com.example.backend.model.entity.article.Article;
 import com.example.backend.model.entity.user.User;
 import com.example.backend.repository.ArticleRepository;
-import com.example.backend.utils.FileManagerUtil;
 import com.example.backend.utils.PageableUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,17 +14,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
-    private final FileManagerUtil fileManagerUtil;
+    private final FileStoreService fileStoreService;
 
     @Autowired
-    public ArticleServiceImpl(ArticleRepository articleRepository, FileManagerUtil fileManagerUtil) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, FileStoreService fileStoreService) {
         this.articleRepository = articleRepository;
-        this.fileManagerUtil = fileManagerUtil;
+        this.fileStoreService = fileStoreService;
     }
 
     @Override
@@ -55,7 +56,7 @@ public class ArticleServiceImpl implements ArticleService {
             throw new IllegalArgumentException("New article cannot be null");
         }
 
-        List<String> imageLinks = fileManagerUtil.saveFilesAndGetLinks(images);
+        List<String> imageLinks = fileStoreService.saveFiles(images);
 
         Article newArticle = new Article(
                 articleDto.getTitle(),
@@ -85,9 +86,20 @@ public class ArticleServiceImpl implements ArticleService {
 
         Article article = checkArticlePresentAndGet(id);
 
-        List<String> imageLinks = fileManagerUtil.saveFilesAndGetLinks(images);
-        if (imageLinks != null && !imageLinks.isEmpty()) {
-            article.getImageLinks().addAll(imageLinks);
+        List<String> links = articleDto.getImageLinks();
+
+        if (links != null) {
+            List<String> difference = new ArrayList<>(article.getImageLinks());
+            difference.removeAll(links);
+            fileStoreService.deleteFiles(difference);
+
+            article.setImageLinks(links);
+        }
+
+        List<String> savedFilesLink = fileStoreService.saveFiles(images);
+
+        if (savedFilesLink != null && !savedFilesLink.isEmpty()) {
+            article.getImageLinks().addAll(savedFilesLink);
         }
 
         article.setTitle(articleDto.getTitle());
@@ -102,7 +114,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         Article article = checkArticlePresentAndGet(id);
 
-        fileManagerUtil.deleteFiles(article.getImageLinks());
+        fileStoreService.deleteFiles(article.getImageLinks());
 
         articleRepository.delete(article);
     }
@@ -119,20 +131,6 @@ public class ArticleServiceImpl implements ArticleService {
         Page<Article> articles = articleRepository.findArticlesBySubscribedUserSortedByDate(user.getId(), pageable);
 
         return articles.map(ArticleDto::new);
-    }
-
-    @Override
-    public void deleteArticleImageLink(Long id, String imageLink) throws IllegalArgumentException {
-        if (imageLink == null) {
-            throw new IllegalArgumentException("Image link cannot be null");
-        }
-
-        Article article = checkArticlePresentAndGet(id);
-
-        fileManagerUtil.deleteFiles(List.of(imageLink));
-        article.getImageLinks().remove(imageLink);
-
-        articleRepository.save(article);
     }
 
     @Override

@@ -3,7 +3,7 @@
 
   <main class="form-signin">
     <div class="container">
-      <form ref="form" @submit.prevent="submitForm" class="needs-validation" novalidate>
+      <form ref="form" @submit="submitForm" class="needs-validation" novalidate>
         <img class="mb-4" src="/img/logo.png" width="100" height="100"/>
         <h1 class="h3 mb-3 fw-normal">Sign in</h1>
         <div class="form-floating">
@@ -43,12 +43,18 @@ export default {
   },
   methods: {
     submitForm() {
+      const form = this.$refs.form;
+      if (!form.checkValidity()) {
+        return;
+      }
+
       this.errors = []
 
       const user = {
         email: this.email,
         password: this.password
       }
+
       AXIOS.post('/auth/login', user)
           .then(response => {
             this.$store.dispatch('loginAction', {

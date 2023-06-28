@@ -1,9 +1,6 @@
 <template>
-  <div class="alert-holder">
-    <div class="alert alert-danger" role="alert" v-for="(error, index) in errors" :key="index" v-bind:class="{ 'show': errors.length }">
-      {{ error.message }}
-    </div>
-  </div>
+  <errors-view v-bind:errors="errors"/>
+
   <pagination-component
       v-bind:currentPage="currentPage"
       v-bind:totalPages="totalPages"
@@ -31,8 +28,10 @@
 import {AXIOS} from "@/http-commons";
 import ArticlesList from "@/components/ArticlesList.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
+import ErrorsView from "@/components/ErrorsView.vue";
 export default {
   components: {
+    ErrorsView,
     ArticlesList,
     PaginationComponent
   },
@@ -63,9 +62,6 @@ export default {
             if (!Array.isArray(error.response.data)) {
               this.errors.push(error.response.data)
             }
-            setTimeout(() => {
-              this.errors = [];
-            }, 5000)
           })
     },
     handlePageChange(pageNumber) {

@@ -65,7 +65,7 @@ export default {
         }
       }
 
-      return 'https://via.placeholder.com/150';
+      return '/img/icon/paw.png';
     },
     formatDateTime(dateTimeString) {
       const options = { day: 'numeric', month: 'long', hour: 'numeric', minute: 'numeric' };
