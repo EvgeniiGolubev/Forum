@@ -16,7 +16,7 @@
             <router-link class="nav-link px-2 text-blue" to="/profile" v-if="isVisible">Profile</router-link>
           </li>
           <li>
-            <router-link class="nav-link px-2 text-blue" to="/article" v-if="isVisible">Create new article</router-link>
+            <router-link class="nav-link px-2 text-blue" to="/create-article" v-if="isVisible">Create new article</router-link>
           </li>
           <li>
             <router-link class="nav-link px-2 text-blue" to="/activity-feed" v-if="isVisible">Activity Feed</router-link>
@@ -42,7 +42,7 @@
               <router-link class="dropdown-item" to="/profile">Profile</router-link>
             </li>
             <li>
-              <router-link class="dropdown-item" to="/article">Creat new article</router-link>
+              <router-link class="dropdown-item" to="/create-article">Creat new article</router-link>
             </li>
             <li>
               <router-link class="dropdown-item" to="/activity-feed">Activity Feed</router-link>

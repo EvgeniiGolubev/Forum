@@ -83,6 +83,9 @@ const mutations = {
     },
     changeNameMutation: (state, name) => {
         state.name = name
+    },
+    changePictureMutation: (state, picture) => {
+        state.picture = picture
     }
 }
 
@@ -95,6 +98,9 @@ const actions = {
     },
     changeNameAction: (context, name) => {
         context.commit('changeNameMutation', name)
+    },
+    changePictureAction: (context, picture) => {
+        context.commit('changePictureMutation', picture)
     }
 }
 

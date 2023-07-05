@@ -36,11 +36,12 @@ public class ArticleController {
 
     @GetMapping
     public ResponseEntity<?> findAllArticles(
+            @RequestParam("stringSearch") String stringSearch,
             @RequestParam("sortType") String sortType,
             @RequestParam("page") int page,
             @RequestParam("pageSize") int pageSize
     ) {
-        Page<ArticleDto> articles = articleService.findAllArticles(sortType, page, pageSize);
+        Page<ArticleDto> articles = articleService.findAllArticles(stringSearch, sortType, page, pageSize);
 
         return new ResponseEntity<>(articles, HttpStatus.OK);
     }

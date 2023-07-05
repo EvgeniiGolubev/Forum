@@ -6,8 +6,7 @@
       <article-form v-bind:selected-article="article"  @form-submitted="reloadPage"/>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center my-2" role="group"
-         aria-label="Basic mixed styles example" v-if="isAuthor && article">
+    <div class="d-flex justify-content-between align-items-center my-2" role="group" v-if="isAuthor">
       <div>
         <button type="button" class="btn btn-outline-danger" @click="deleteArticle(article.id)">Delete article</button>
         <button type="button" class="btn btn-outline-primary mx-2" @click="editArticle()">Edit article</button>
@@ -18,7 +17,8 @@
       <div class="card-header bg-card">
         <div id="carousel" class="carousel slide" v-if="showCarousel">
           <div class="carousel-inner">
-            <div v-for="(imageLink, index) in article.imageLinks" :key="index" :class="['carousel-item', index === 0 ? 'active' : '']" style="height: 500px;">
+            <div v-for="(imageLink, index) in article.imageLinks" :key="index" :class="['carousel-item', index === 0 ? 'active' : '']"
+                 style="height: 500px;">
               <img :src="getImagePath(imageLink)" class="d-block w-100 image-container" alt="Article Image">
             </div>
           </div>
@@ -107,6 +107,7 @@ export default {
       AXIOS.get(`/articles/${articleId}`)
           .then(response => {
             this.article = response.data
+            this.isAuthor = this.$store.getters.getId === this.article.author.id
             this.showCarousel = this.article.imageLinks.length > 0
           })
           .catch(error => {
@@ -182,13 +183,6 @@ export default {
         this.errors.push(error.response.data)
       }
     },
-    isAuthorCheck() {
-      if (this.article) {
-        this.isAuthor = this.$store.getters.getId === this.article.author.id
-      } else {
-        this.isAuthor = true
-      }
-    },
     reloadPage(id) {
       this.visibleForm = false
       this.articleId = id
@@ -200,11 +194,7 @@ export default {
     if (articleId) {
       this.articleId = articleId
       this.getArticle(articleId);
-    } else {
-      this.visibleForm = true
     }
-
-    this.isAuthorCheck()
   },
 }
 </script>

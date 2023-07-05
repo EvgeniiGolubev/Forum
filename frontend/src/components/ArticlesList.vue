@@ -2,15 +2,17 @@
   <div class="album py-5">
     <div class="container">
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-        <div class="col" v-for="article in articles" :key="article.id">
 
-          <div class="card shadow-sm">
-            <img :src="getImagePath(article.imageLinks[0])" class="bd-placeholder-img card-img-top">
+        <div class="col" v-for="article in articles" :key="article.id" >
+          <div class="card shadow-sm" style="max-height: 600px; padding-top: 5px;">
+            <img :src="getImagePath(article.imageLinks[0])" class="bd-placeholder-img card-img-top" style="object-fit: contain; height: 300px;">
             <div class="card-body">
               <h4 class="card-title text-md-start">{{ article.title }}</h4>
               <p class="card-text text-md-start">{{ truncateText(article.content) }}</p>
               <div class="d-flex justify-content-between align-items-center">
-                <button type="button" class="btn btn-link text-without-underline" v-on:click="openAuthorProfile(article.author.id)">{{ article.author.name }}</button>
+                <button type="button" class="btn btn-link text-without-underline" v-on:click="openAuthorProfile(article.author.id)">
+                  {{ article.author.name }}
+                </button>
               </div>
               <hr>
               <div class="d-flex justify-content-between align-items-center">
@@ -24,8 +26,8 @@
               </div>
             </div>
           </div>
-
         </div>
+
       </div>
     </div>
   </div>
@@ -38,6 +40,7 @@ import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 
 library.add(fas, far)
+
 export default {
   components: {FontAwesomeIcon},
   props: ['articles'],
@@ -74,10 +77,10 @@ export default {
       return `${date}`;
     },
     truncateText(content) {
-      if (content.length <= 200) {
+      if (content.length <= 100) {
         return content
       } else {
-        return content.slice(0, 200) + '...'
+        return content.slice(0, 100) + '...'
       }
     }
   }
@@ -89,6 +92,7 @@ export default {
   margin-left: 15px;
   margin-right: 5px;
 }
+
 
 .text-without-underline {
   text-decoration: none;

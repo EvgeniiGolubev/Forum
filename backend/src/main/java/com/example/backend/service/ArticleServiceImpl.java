@@ -30,9 +30,16 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Page<ArticleDto> findAllArticles(String sortType, int page, int pageSize) throws IllegalArgumentException {
+    public Page<ArticleDto> findAllArticles(String stringSearch, String sortType, int page, int pageSize) throws IllegalArgumentException {
         Pageable pageable = PageableUtil.validPaginationAndGetPageable(sortType, page, pageSize, "creationDate");
-        Page<Article> articles = articleRepository.findAll(pageable);
+
+        Page<Article> articles;
+
+        if (stringSearch != null && !stringSearch.isEmpty()) {
+            articles = articleRepository.findByTitleContaining(stringSearch, pageable);
+        } else {
+            articles = articleRepository.findAll(pageable);
+        }
 
         return articles.map(ArticleDto::new);
     }
