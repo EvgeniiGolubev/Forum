@@ -7,6 +7,7 @@ import MainComponent from "@/pages/MainComponent.vue";
 import ProfileComponent from "@/pages/ProfileComponent.vue";
 import UsersComponent from "@/pages/UsersComponent.vue";
 import ArticlePage from "@/pages/ArticlePage.vue";
+import CreateArticlePage from "@/pages/CreateArticlePage.vue";
 import ActivityFeed from "@/pages/ActivityFeed.vue";
 
 const router = createRouter({
@@ -19,7 +20,8 @@ const router = createRouter({
         { path: '/registration/oauth2-success', name: 'Oauth2Success', component: Oauth2Success },
         { path: '/profile/:id?', name: 'ProfileComponent', component: ProfileComponent },
         { path: '/users', name: 'UsersComponent', component: UsersComponent },
-        { path: '/article/:id?', name: 'ArticlePage', component: ArticlePage },
+        { path: '/article/:id', name: 'ArticlePage', component: ArticlePage },
+        { path: '/create-article', name: 'CreateArticlePage', component: CreateArticlePage },
         { path: '/activity-feed', name: 'ActivityFeed', component: ActivityFeed },
     ]
 })

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 public interface ArticleRepository extends JpaRepository<Article, Long>  {
     Page<Article> findAll(Pageable pageable);
 
+    Page<Article> findByTitleContaining(String searchQuery, Pageable pageable);
+
     @Query("SELECT a FROM Article a WHERE a.author.id IN (SELECT us.channel.id FROM UserSubscription us WHERE us.subscriber.id = :userId)")
     Page<Article> findArticlesBySubscribedUserSortedByDate(@Param("userId") Long id, Pageable pageable);
 }

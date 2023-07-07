@@ -1,66 +1,67 @@
 <template>
-  <div class="alert-holder">
-    <div class="alert alert-danger" role="alert" v-for="(error, index) in errors" :key="index" v-bind:class="{ 'show': errors.length }">
-      {{ error.message }}
-    </div>
-    <div class="alert alert-success" role="alert" v-if="alertMessage" v-bind:class="{ 'show': alertMessage }">
-      {{ alertMessage }}
-    </div>
-  </div>
+  <errors-view v-bind:errors="errors"/>
+  <alert-view v-bind:alert-message="alertMessage"/>
 </template>
 
 <script>
 import {AXIOS} from "@/http-commons";
+import AlertView from "@/components/AlertView.vue";
+import ErrorsView from "@/components/ErrorsView.vue";
 
 export default {
+  components: {ErrorsView, AlertView},
   data() {
     return {
       errors: [],
       alertMessage: null,
     }
   },
-  mounted() {
-    AXIOS.get("/auth/oauth2-success")
-        .then(response => {
-          this.$store.dispatch('loginAction', {
-            authenticate: true,
-            roles: response.data.roles,
-            name: response.data.name,
-            picture: response.data.userPicture,
-            id: response.data.id
+  methods: {
+    loginUser() {
+      AXIOS.get("/auth/oauth2-success")
+          .then(response => {
+            this.$store.dispatch('loginAction', {
+              authenticate: true,
+              roles: response.data.roles,
+              name: response.data.name,
+              picture: response.data.userPicture,
+              id: response.data.id
+            })
+
+            this.alertMessage = 'You successfully sign in'
+            setTimeout(() => {
+              this.alertMessage = null
+              this.$router.push('/profile')
+            }, 1000)
           })
-
-          this.alertMessage = 'You successfully sign in'
-          setTimeout(() => {
-            this.alertMessage = null
-            this.$router.push('/profile')
-          }, 5000)
-        })
-        .catch(error => {
-          if (!Array.isArray(error.response.data)) {
-            this.errors.push(error.response.data)
-          }
-
-          setTimeout(() => {
-            this.errors = [];
-          }, 5000)
-        });
+          .catch(error => {
+            this.handleError(error)
+          })
+    },
+    getUserSubscriptions() {
+      AXIOS.get("/profile/subscriptions")
+          .then(response => {
+            this.$store.dispatch('addSubscriptionAction', response.data)
+          })
+          .catch(error => {
+            this.handleError(error)
+          })
+    },
+    handleError(error) {
+      if (error) {
+        if (!Array.isArray(error.response.data)) {
+          this.errors.push(error.response.data)
+        }
+      }
+    }
+  },
+  mounted() {
+    this.loginUser()
+    this.getUserSubscriptions()
   }
 }
 </script>
 
 <style>
-.alert-holder {
-  max-width: 800px;
-  margin: 0 auto;
-}
 
-.alert {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.alert.show {
-  opacity: 1;
-}
 </style>

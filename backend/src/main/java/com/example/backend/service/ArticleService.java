@@ -10,7 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ArticleService {
-    Page<ArticleDto> findAllArticles(String sortType, int page, int pageSize) throws IllegalArgumentException;
+    Page<ArticleDto> findAllArticles(String stringSearch, String sortType, int page, int pageSize)
+            throws IllegalArgumentException;
     ArticleDto findArticleById(Long id) throws IllegalArgumentException, ArticleNotFoundException;
 
     ArticleDto createArticle(User author, ArticleDto articleDto, List<MultipartFile> images)
@@ -26,6 +27,4 @@ public interface ArticleService {
 
     Page<ArticleDto> getArticlesBySubscription(User user, String sortType, int page, int pageSize)
             throws IllegalArgumentException;
-
-    void deleteArticleImageLink(Long id, String imageLink) throws IllegalArgumentException;
 }

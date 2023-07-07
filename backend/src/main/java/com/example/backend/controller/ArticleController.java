@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Set;
 
@@ -35,13 +36,20 @@ public class ArticleController {
 
     @GetMapping
     public ResponseEntity<?> findAllArticles(
+            @RequestParam("stringSearch") String stringSearch,
             @RequestParam("sortType") String sortType,
             @RequestParam("page") int page,
             @RequestParam("pageSize") int pageSize
     ) {
-        Page<ArticleDto> articles = articleService.findAllArticles(sortType, page, pageSize);
+        Page<ArticleDto> articles = articleService.findAllArticles(stringSearch, sortType, page, pageSize);
 
         return new ResponseEntity<>(articles, HttpStatus.OK);
+    }
+
+    @GetMapping("/author/{authorId}")
+    public ResponseEntity<?> findArticlesByAuthor(@PathVariable("authorId") Long authorId) {
+        //todo to do!
+        return null;
     }
 
     @GetMapping("/{id}")
@@ -55,7 +63,7 @@ public class ArticleController {
     public ResponseEntity<?> createArticle(
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
             @Valid @ModelAttribute ArticleDto articleDto,
-            @RequestPart(name = "images", required = false) List<MultipartFile> images
+            @RequestPart(name = "newImages", required = false) List<MultipartFile> images
     ) {
         User author = userService.getUserFromUserDetails(authenticatedUser);
 
@@ -69,7 +77,7 @@ public class ArticleController {
             @PathVariable("id") Long id,
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
             @Valid @ModelAttribute ArticleDto articleDto,
-            @RequestPart(name = "images", required = false) List<MultipartFile> images
+            @RequestPart(name = "newImages", required = false) List<MultipartFile> images
     ) {
         User actualAuthor = articleService.getArticleAuthorByArticleId(id);
         User author = userService.getUserFromUserDetails(authenticatedUser);
@@ -92,13 +100,6 @@ public class ArticleController {
         checkAccess(actualAuthor, author);
 
         articleService.deleteArticle(id, author);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @PreAuthorize("hasAuthority('USER')")
-    @DeleteMapping("/delete-image/{id}")
-    public ResponseEntity<?> deleteArticleImageLink(@PathVariable("id") Long id, @RequestParam String imageLink) {
-        articleService.deleteArticleImageLink(id, imageLink);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

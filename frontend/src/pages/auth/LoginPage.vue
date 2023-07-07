@@ -3,16 +3,18 @@
 
   <main class="form-signin">
     <div class="container">
-      <form ref="form" @submit.prevent="submitForm" class="needs-validation" novalidate>
+      <form ref="form" @submit="submitForm" class="needs-validation" novalidate>
         <img class="mb-4" src="/img/logo.png" width="100" height="100"/>
         <h1 class="h3 mb-3 fw-normal">Sign in</h1>
         <div class="form-floating">
-          <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" v-model="email" required>
+          <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" maxlength="255"
+                 v-model="email" required>
           <label for="floatingInput">Email address</label>
           <div class="invalid-feedback" >Please provide a valid email address.</div>
         </div>
         <div class="form-floating mt-3">
-          <input type="password" class="form-control" id="floatingPassword" placeholder="Password" v-model="password" required minlength="1">
+          <input type="password" class="form-control" id="floatingPassword" placeholder="Password" maxlength="255"
+                 v-model="password" required minlength="1">
           <label for="floatingPassword">Password</label>
           <div class="invalid-feedback" >Password must be at least 8 characters long.</div>
         </div>
@@ -43,12 +45,18 @@ export default {
   },
   methods: {
     submitForm() {
+      const form = this.$refs.form;
+      if (!form.checkValidity()) {
+        return;
+      }
+
       this.errors = []
 
       const user = {
         email: this.email,
         password: this.password
       }
+
       AXIOS.post('/auth/login', user)
           .then(response => {
             this.$store.dispatch('loginAction', {
@@ -62,13 +70,26 @@ export default {
             this.$router.push('/profile')
           })
           .catch(error => {
-            if (!Array.isArray(error.response.data)) {
-              this.errors.push(error.response.data)
-            }
+            this.handleError(error)
+          })
+
+      AXIOS.get("/profile/subscriptions")
+          .then(response => {
+            this.$store.dispatch('addSubscriptionAction', response.data)
+          })
+          .catch(error => {
+            this.handleError(error)
           })
     },
     toRegistration() {
       this.$router.push('/registration')
+    },
+    handleError(error) {
+      if (error) {
+        if (!Array.isArray(error.response.data)) {
+          this.errors.push(error.response.data)
+        }
+      }
     }
   },
   mounted() {

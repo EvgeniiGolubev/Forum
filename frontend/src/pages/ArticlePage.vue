@@ -6,8 +6,7 @@
       <article-form v-bind:selected-article="article"  @form-submitted="reloadPage"/>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center my-2" role="group"
-         aria-label="Basic mixed styles example" v-if="isAuthor">
+    <div class="d-flex justify-content-between align-items-center my-2" role="group" v-if="isAuthor">
       <div>
         <button type="button" class="btn btn-outline-danger" @click="deleteArticle(article.id)">Delete article</button>
         <button type="button" class="btn btn-outline-primary mx-2" @click="editArticle()">Edit article</button>
@@ -18,7 +17,8 @@
       <div class="card-header bg-card">
         <div id="carousel" class="carousel slide" v-if="showCarousel">
           <div class="carousel-inner">
-            <div v-for="(imageLink, index) in article.imageLinks" :key="index" :class="['carousel-item', index === 0 ? 'active' : '']" style="height: 500px;">
+            <div v-for="(imageLink, index) in article.imageLinks" :key="index" :class="['carousel-item', index === 0 ? 'active' : '']"
+                 style="height: 500px;">
               <img :src="getImagePath(imageLink)" class="d-block w-100 image-container" alt="Article Image">
             </div>
           </div>
@@ -53,24 +53,8 @@
       </div>
     </div>
   </main>
-  <div class="container" v-if="commentsOpen">
-    <div class="card my-3 p-3 bg-body rounded shadow-sm">
-      <h5 class="border-bottom pb-2 mb-0 text-md-start">Comments</h5>
-      <div class="d-flex text-body-secondary pt-3" v-for="comment in comments" :key="comment.id">
-        <img :src="getImagePath(comment.author.userPicture)" class="bd-placeholder-img flex-shrink-0 me-2 rounded" style="width: 50px; height: 50px;">
-        <p class="pb-3 mb-0 lh-sm border-bottom text-md-start">
-          <strong class="d-block text-gray-dark">{{ comment.author.name }}</strong>
-          {{ comment.comment }}
-        </p>
-      </div>
-      <hr>
-      <div class="d-flex text-body-secondary pt-3">
-        <textarea class="form-control" rows="2" v-model="newComment"></textarea>
-        <input type="button" value="Submit сomment" v-on:click="submitComment(article.id)"
-               class="btn btn-outline-primary" style="height: 40px; margin-left: 25px;"/>
-      </div>
-    </div>
-  </div>
+
+  <comments-list v-bind:comments="comments" v-bind:article-id="article.id" @new-comment="newCommentAdded" v-if="commentsOpen"/>
 
 </template>
 
@@ -82,32 +66,17 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import ErrorsView from "@/components/ErrorsView.vue";
+import CommentsList from "@/components/CommentsList.vue";
 
 library.add(fas, far)
 
 export default {
-  components: {ErrorsView, ArticleForm, FontAwesomeIcon},
+  components: {CommentsList, ErrorsView, ArticleForm, FontAwesomeIcon},
   data() {
     return {
       errors: [],
-      article: {
-        "id": 8,
-        "title": "dsdxcascascassss",
-        "content": "asxdffgsfgsdvsdvase adfasd asfasf as fas fawfw awfqwwf asf asf as faw",
-        "author": {
-          "id": 3,
-          "name": "biba",
-          "userPicture": "https://via.placeholder.com/50"
-        },
-        "creationDate": "2023-06-12 16:04:43",
-        "imageLinks": [
-          "https://via.placeholder.com/150",
-          "https://via.placeholder.com/150",
-          "https://via.placeholder.com/150",
-        ]
-      },
+      article: null,
       comments: [],
-      newComment: '',
       visibleForm: false,
       showCarousel: true,
       articleLiked: false,
@@ -122,6 +91,7 @@ export default {
       AXIOS.get(`/articles/${articleId}`)
           .then(response => {
             this.article = response.data
+            this.isAuthor = this.$store.getters.getId === this.article.author.id
             this.showCarousel = this.article.imageLinks.length > 0
           })
           .catch(error => {
@@ -129,7 +99,7 @@ export default {
           })
     },
     openComments(articleId) {
-      AXIOS.get(`/comments/${articleId}`)
+      AXIOS.get(`/comments/article/${articleId}`)
           .then(response => {
             this.comments = response.data
           })
@@ -138,18 +108,9 @@ export default {
           })
       this.commentsOpen = !this.commentsOpen
     },
-    submitComment(articleId) {
-      AXIOS.post(`/comments/${articleId}`, {newComment: this.newComment})
-          .then(response => {
-            let index = this.comments.findIndex(item => item.id === response.data.id)
-            this.comments.splice(index, 1, response.data);
-          })
-          .catch(error => {
-            this.handleError(error)
-          })
-    },
     likeArticle(articleId) {
       console.log(articleId)
+
       if (this.articleLiked) {
         this.articleLiked = false
         this.articleLikes--
@@ -164,7 +125,8 @@ export default {
     deleteArticle(id) {
       AXIOS.delete(`/articles/${id}`)
           .then(response => {
-            this.responseMessages = response.data.message
+            console.log(response)
+            this.$router.push("/")
           })
           .catch(error => {
             this.handleError(error)
@@ -172,6 +134,10 @@ export default {
     },
     editArticle() {
       this.visibleForm = !this.visibleForm
+    },
+    newCommentAdded(comment) {
+      let index = this.comments.findIndex(item => item.id === comment.id)
+      this.comments.splice(index, 1, comment);
     },
     getImagePath(link) {
       if (link && typeof link === 'string') {
@@ -182,7 +148,7 @@ export default {
         }
       }
 
-      return 'https://via.placeholder.com/150';
+      return '/img/icon/paw.png';
     },
     formatDateTime(dateTimeString) {
       const options = { day: 'numeric', month: 'long', hour: 'numeric', minute: 'numeric' };
@@ -195,15 +161,10 @@ export default {
         this.errors.push(error.response.data)
       }
     },
-    isAuthorCheck() {
-      if (this.article) {
-        this.isAuthor = this.$store.getters.getId === this.article.author.id
-      }
-
-      this.isAuthor = true
-    },
-    reloadPage() {
+    reloadPage(id) {
       this.visibleForm = false
+      this.articleId = id
+      this.getArticle(id)
     }
   },
   mounted() {
@@ -212,8 +173,6 @@ export default {
       this.articleId = articleId
       this.getArticle(articleId);
     }
-
-    this.isAuthorCheck()
   },
 }
 </script>

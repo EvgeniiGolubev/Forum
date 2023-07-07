@@ -6,7 +6,6 @@ import com.example.backend.model.dto.profile.UserProfileDto;
 import com.example.backend.model.dto.user.ChangeUserEmailDto;
 import com.example.backend.model.dto.user.ChangeUserPasswordDto;
 import com.example.backend.model.entity.user.User;
-import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -16,8 +15,9 @@ public interface ProfileService {
 
     UserProfileDto getUserProfile(User owner) throws IllegalArgumentException;
 
-    UserProfileDto updateUserProfile(User owner, UserProfileDto user, MultipartFile image)
-            throws IllegalArgumentException, FileManagerException;
+    UserProfileDto updateUserProfile(User owner, UserProfileDto user) throws IllegalArgumentException;
+
+    void updateUserImage(User owner, MultipartFile image) throws FileManagerException;
 
     void deleteUserProfile(User owner) throws IllegalArgumentException;
 

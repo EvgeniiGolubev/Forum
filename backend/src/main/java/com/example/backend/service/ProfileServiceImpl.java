@@ -9,7 +9,6 @@ import com.example.backend.model.entity.user.User;
 import com.example.backend.model.entity.user.UserSubscription;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.UserSubscriptionRepository;
-import com.example.backend.utils.FileManagerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,19 +22,19 @@ import java.util.stream.Collectors;
 public class ProfileServiceImpl implements ProfileService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final FileManagerUtil fileManagerUtil;
+    private final FileStoreService fileStoreService;
     private final UserSubscriptionRepository userSubscriptionRepository;
 
     @Autowired
     public ProfileServiceImpl(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            FileManagerUtil fileManagerUtil,
+            FileStoreService fileStoreService,
             UserSubscriptionRepository userSubscriptionRepository
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.fileManagerUtil = fileManagerUtil;
+        this.fileStoreService = fileStoreService;
         this.userSubscriptionRepository = userSubscriptionRepository;
     }
 
@@ -64,8 +63,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public UserProfileDto updateUserProfile(User owner, UserProfileDto updateUser, MultipartFile image)
-            throws IllegalArgumentException, FileManagerException {
+    public UserProfileDto updateUserProfile(User owner, UserProfileDto updateUser) throws IllegalArgumentException {
 
         if (owner == null) {
             throw new IllegalArgumentException("User cannot be null");
@@ -75,14 +73,23 @@ public class ProfileServiceImpl implements ProfileService {
             throw new IllegalArgumentException("Updated user cannot be null");
         }
 
-        if (image != null) {
-            List<String> imageLink = fileManagerUtil.saveFilesAndGetLinks(List.of(image));
-            owner.setUserPicture(imageLink.get(0));
-        }
+
 
         owner.setName(updateUser.getName());
+        owner.setDescription(updateUser.getDescription());
 
         return new UserProfileDto(userRepository.save(owner));
+    }
+
+    @Override
+    public void updateUserImage(User owner, MultipartFile image) throws FileManagerException {
+        if (image != null) {
+            List<String> links = fileStoreService.saveFiles(List.of(image));
+
+            if (links != null && !links.isEmpty()) {
+                owner.setUserPicture(links.get(0));
+            }
+        }
     }
 
     @Override

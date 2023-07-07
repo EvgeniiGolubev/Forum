@@ -1,29 +1,32 @@
 <template>
-  <div class="alert-holder">
-    <div class="alert alert-danger" role="alert" v-for="(error, index) in errors" :key="index" v-bind:class="{ 'show': errors.length }">
-      {{ error.message }}
-    </div>
-  </div>
+  <errors-view v-bind:errors="errors"/>
+
   <pagination-component
+      v-bind:show-search-panel="true"
       v-bind:currentPage="currentPage"
       v-bind:totalPages="totalPages"
       v-bind:sortOrder="sortOrder"
       v-bind:itemsPerPageOptions="[5, 10, 15, 20]"
+      v-bind:string-search="stringSearch"
       @page-changed="handlePageChange"
       @sort-order-changed="handleSortOrderChange"
       @items-per-page-changed="handleItemsPerPageChange"
+      @substring-search="substringSearch"
   />
 
   <articles-list v-bind:articles="articles"/>
 
   <pagination-component
+      v-bind:show-search-panel="false"
       v-bind:currentPage="currentPage"
       v-bind:totalPages="totalPages"
       v-bind:sortOrder="sortOrder"
       v-bind:itemsPerPageOptions="[5, 10, 15, 20]"
+      v-bind:string-search="stringSearch"
       @page-changed="handlePageChange"
       @sort-order-changed="handleSortOrderChange"
       @items-per-page-changed="handleItemsPerPageChange"
+      @substring-search="substringSearch"
   />
 </template>
 
@@ -31,8 +34,10 @@
 import {AXIOS} from "@/http-commons";
 import ArticlesList from "@/components/ArticlesList.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
+import ErrorsView from "@/components/ErrorsView.vue";
 export default {
   components: {
+    ErrorsView,
     ArticlesList,
     PaginationComponent
   },
@@ -43,12 +48,14 @@ export default {
       currentPage: 1,
       totalPages: 1,
       pageSize: 5,
-      sortOrder: 'desc'
+      sortOrder: 'desc',
+      stringSearch: '',
     }
   },
   methods: {
     getArticles() {
       const params = {
+        stringSearch: this.stringSearch,
         pageSize: this.pageSize,
         page: this.currentPage,
         sortType: this.sortOrder
@@ -63,9 +70,6 @@ export default {
             if (!Array.isArray(error.response.data)) {
               this.errors.push(error.response.data)
             }
-            setTimeout(() => {
-              this.errors = [];
-            }, 5000)
           })
     },
     handlePageChange(pageNumber) {
@@ -81,8 +85,12 @@ export default {
       this.pageSize = itemsPerPage;
       this.currentPage = 1;
       this.getArticles();
+    },
+    substringSearch(substring) {
+      this.stringSearch = substring
+      this.currentPage = 1;
+      this.getArticles();
     }
-
   },
   mounted() {
     this.getArticles()
@@ -91,17 +99,5 @@ export default {
 </script>
 
 <style>
-.alert-holder {
-  max-width: 800px;
-  margin: 0 auto;
-}
 
-.alert {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.alert.show {
-  opacity: 1;
-}
 </style>
