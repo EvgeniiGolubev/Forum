@@ -54,15 +54,6 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public UserProfileDto getUserProfile(User owner) throws IllegalArgumentException {
-        if (owner == null) {
-            throw new UserNotFoundException("User id cannot be null");
-        }
-
-        return new UserProfileDto(owner);
-    }
-
-    @Override
     public UserProfileDto updateUserProfile(User owner, UserProfileDto updateUser) throws IllegalArgumentException {
 
         if (owner == null) {
@@ -82,14 +73,18 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void updateUserImage(User owner, MultipartFile image) throws FileManagerException {
+    public UserProfileDto updateUserImage(User owner, MultipartFile image) throws FileManagerException {
         if (image != null) {
             List<String> links = fileStoreService.saveFiles(List.of(image));
 
             if (links != null && !links.isEmpty()) {
                 owner.setUserPicture(links.get(0));
             }
+
+            return new UserProfileDto(userRepository.save(owner));
         }
+
+        return new UserProfileDto(owner);
     }
 
     @Override

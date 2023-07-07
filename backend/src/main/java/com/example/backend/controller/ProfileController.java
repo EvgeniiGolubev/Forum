@@ -1,9 +1,11 @@
 package com.example.backend.controller;
 
+import com.example.backend.exception.UserNotFoundException;
 import com.example.backend.model.dto.profile.UserProfileDto;
 import com.example.backend.model.dto.user.ChangeUserEmailDto;
 import com.example.backend.model.dto.user.ChangeUserPasswordDto;
 import com.example.backend.model.entity.user.Provider;
+import com.example.backend.model.entity.user.Role;
 import com.example.backend.model.entity.user.User;
 import com.example.backend.security.UserDetailsImpl;
 import com.example.backend.security.jwt.JwtUtils;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +26,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -55,31 +59,38 @@ public class ProfileController {
         return new ResponseEntity<>(profile, HttpStatus.OK);
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateUserProfile(
+            @PathVariable("id") Long id,
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
-            @Valid @RequestBody UserProfileDto user
+            @Valid @RequestBody UserProfileDto profile
     ) {
-        User owner = userService.getUserFromUserDetails(authenticatedUser);
+        User owner = checkAccessAndReturnProfileOwner(id, authenticatedUser);
 
-        UserProfileDto updatedProfile = profileService.updateUserProfile(owner, user);
+        UserProfileDto updatedProfile = profileService.updateUserProfile(owner, profile);
         return new ResponseEntity<>(updatedProfile, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/update-image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PutMapping(value = "/{id}/update-image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateUserImage(
+            @PathVariable("id") Long id,
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
             @RequestPart(name = "image", required = false) MultipartFile image
     ) {
-        return null;
+        User owner = checkAccessAndReturnProfileOwner(id, authenticatedUser);
+
+        UserProfileDto updatedProfile = profileService.updateUserImage(owner, image);
+
+        return new ResponseEntity<>(updatedProfile, HttpStatus.OK);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUserProfile(
+            @PathVariable("id") Long id,
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
             HttpServletResponse response
     ) {
-        User owner = userService.getUserFromUserDetails(authenticatedUser);
+        User owner = checkAccessAndReturnProfileOwner(id, authenticatedUser);
 
         profileService.deleteUserProfile(owner);
 
@@ -88,81 +99,87 @@ public class ProfileController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/subscriptions/{profileId}")
-    public ResponseEntity<?> getUserSubscriptions(@PathVariable("profileId") Long profileId) {
-        User owner = userService.findUserById(profileId);
+    @GetMapping("/{id}/subscriptions")
+    public ResponseEntity<?> getUserSubscriptions(@PathVariable("id") Long id) {
+        User owner = userService.findUserById(id);
 
         List<UserProfileDto> subscriptions = profileService.getUserSubscriptions(owner);
         return new ResponseEntity<>(subscriptions, HttpStatus.OK);
     }
 
-    @PostMapping("/subscriptions/{channelId}")
+    @PostMapping("/{id}/subscriptions/{channelId}")
     public ResponseEntity<?> changeSubscription(
+            @PathVariable("id") Long id,
             @PathVariable("channelId") Long channelId,
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
             @RequestParam("subscriptionStatus") Boolean subscriptionStatus
     ) {
+        User subscriber = checkAccessAndReturnProfileOwner(id, authenticatedUser);
+
         User channel = userService.findUserById(channelId);
-        User subscriber = userService.getUserFromUserDetails(authenticatedUser);
 
         profileService.changeSubscription(channel, subscriber, subscriptionStatus);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/subscribers/{profileId}")
-    public ResponseEntity<?> getUserSubscribers(@PathVariable("profileId") Long profileId) {
-        User owner = userService.findUserById(profileId);
+    @GetMapping("/{id}/subscribers")
+    public ResponseEntity<?> getUserSubscribers(@PathVariable("id") Long id) {
+        User owner = userService.findUserById(id);
 
         List<UserProfileDto> subscribers = profileService.getUserSubscribers(owner);
         return new ResponseEntity<>(subscribers, HttpStatus.OK);
     }
 
-    @PostMapping("/subscribers/{subscriberId}")
+    @PostMapping("/{id}/subscribers/{subscriberId}")
     public ResponseEntity<?> changeSubscriberStatus(
+            @PathVariable("id") Long id,
             @PathVariable("subscriberId") Long subscriberId,
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
             @RequestParam("subscriberStatus") Boolean subscriberStatus
     ) {
-        User channel = userService.getUserFromUserDetails(authenticatedUser);
+        User channel = checkAccessAndReturnProfileOwner(id, authenticatedUser);
+
         User subscriber = userService.findUserById(subscriberId);
 
         profileService.changeSubscriberStatus(subscriber, channel, subscriberStatus);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/change-email")
+    @PutMapping("/{id}/change-email")
     public ResponseEntity<?> changeUserEmail(
+            @PathVariable("id") Long id,
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
             @Valid @RequestBody ChangeUserEmailDto newEmail,
             HttpServletResponse response
     ) {
-        User user = userService.getUserFromUserDetails(authenticatedUser);
+        User owner = checkAccessAndReturnProfileOwner(id, authenticatedUser);
 
-        if (user.getProvider() == Provider.GOOGLE) {
+        if (owner.getProvider() == Provider.GOOGLE) {
             return new ResponseEntity<>("Users registered through oauth2 cannot change email", HttpStatus.BAD_REQUEST);
         }
 
-        user = profileService.changeUserEmail(user, newEmail);
-        mailSenderService.sendMessageOnUserEmail(user, SUBJECT, MESSAGE);
+        owner = profileService.changeUserEmail(owner, newEmail);
+        mailSenderService.sendMessageOnUserEmail(owner, SUBJECT, MESSAGE);
 
         logout(response);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/change-password")
+    @PutMapping("/{id}/change-password")
     public ResponseEntity<?> changeUserPassword(
+            @PathVariable("id") Long id,
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
             @Valid @RequestBody ChangeUserPasswordDto newPassword,
             HttpServletResponse response
     ) {
-        User user = userService.getUserFromUserDetails(authenticatedUser);
+        User owner = checkAccessAndReturnProfileOwner(id, authenticatedUser);
 
-        if (user.getProvider() == Provider.GOOGLE) {
+        if (owner.getProvider() == Provider.GOOGLE) {
             return new ResponseEntity<>("Users registered through oauth2 cannot change password", HttpStatus.BAD_REQUEST);
         }
 
-        profileService.changeUserPassword(user, newPassword);
+        profileService.changeUserPassword(owner, newPassword);
 
         logout(response);
 
@@ -173,5 +190,20 @@ public class ProfileController {
         Cookie cookie = jwtUtils.clearCookie();
         response.addCookie(cookie);
         SecurityContextHolder.clearContext();
+    }
+
+    private User checkAccessAndReturnProfileOwner(Long id, UserDetailsImpl authenticatedUser)
+            throws AccessDeniedException, IllegalArgumentException, UserNotFoundException {
+
+        User actualOwner = userService.findUserById(id);
+        User owner = userService.getUserFromUserDetails(authenticatedUser);
+
+        Set<Role> roles = owner.getRoles();
+
+        if (!owner.equals(actualOwner) && !roles.contains(Role.ADMIN)) {
+            throw new AccessDeniedException("Access denied. Only the owner can modify or delete profile");
+        }
+
+        return owner;
     }
 }

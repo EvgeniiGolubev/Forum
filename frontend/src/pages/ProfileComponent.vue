@@ -198,7 +198,7 @@ export default {
         description: this.profile.description
       }
 
-      AXIOS.put(`/profile`, updatedProfile)
+      AXIOS.put(`/profile/${this.profile.id}`, updatedProfile)
           .then(response => {
             this.profile = response.data
             this.$store.dispatch('changeNameAction', response.data.name)
@@ -218,7 +218,7 @@ export default {
         'Content-Type': 'multipart/form-data'
       }
 
-      AXIOS.put(`/profile/update-image`, formData, {headers: headers})
+      AXIOS.put(`/profile/${this.profile.id}/update-image`, formData, {headers: headers})
           .then(response => {
             this.profile = response.data
             this.spinnerVisible = false
@@ -241,7 +241,7 @@ export default {
         password: this.password
       }
 
-      AXIOS.put(`/profile/change-email`, newEmail)
+      AXIOS.put(`/profile/${this.profile.id}/change-email`, newEmail)
           .then(response => {
             console.log(response)
           })
@@ -265,7 +265,7 @@ export default {
         newPassword: this.password,
         confirmPassword: this.confirmPassword
       }
-      AXIOS.put(`/profile/change-password`, newPassword)
+      AXIOS.put(`/profile/${this.profile.id}/change-password`, newPassword)
           .then(response => {
             console.log(response)
           })
@@ -278,13 +278,13 @@ export default {
       this.confirmPassword = ''
     },
     subscribe() {
-      AXIOS.post(`/profile/subscriptions/${this.profile.id}`, {}, {params: {subscriptionStatus: true}})
+      AXIOS.post(`/profile/${this.profile.id}/subscriptions`, {}, {params: {subscriptionStatus: true}})
           .catch(error => {
             this.handleError(error)
           })
     },
     unsubscribe() {
-      AXIOS.post(`/profile/subscriptions/${this.profile.id}`, {}, {params: {subscriptionStatus: false}})
+      AXIOS.post(`/profile/${this.profile.id}/subscriptions`, {}, {params: {subscriptionStatus: false}})
           .catch(error => {
             this.handleError(error)
           })

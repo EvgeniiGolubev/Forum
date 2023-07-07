@@ -13,11 +13,9 @@ import java.util.List;
 public interface ProfileService {
     UserProfileDto getUserProfileById(Long id) throws IllegalArgumentException, UserNotFoundException;
 
-    UserProfileDto getUserProfile(User owner) throws IllegalArgumentException;
-
     UserProfileDto updateUserProfile(User owner, UserProfileDto user) throws IllegalArgumentException;
 
-    void updateUserImage(User owner, MultipartFile image) throws FileManagerException;
+    UserProfileDto updateUserImage(User owner, MultipartFile image) throws FileManagerException;
 
     void deleteUserProfile(User owner) throws IllegalArgumentException;
 

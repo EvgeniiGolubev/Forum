@@ -63,50 +63,10 @@ export default {
         subscribers: false,
         subscriptions: false,
       },
-      subscribers: [
-        {
-          "id": 3,
-          "name": "Evgenii",
-          "userPicture": "5eb09a98-a02c-493c-a304-36aa40871e97.jpg"
-        }
-      ],
-      subscriptions: [
-        {
-          "id": 3,
-          "name": "Evgenii",
-          "userPicture": "5eb09a98-a02c-493c-a304-36aa40871e97.jpg"
-        }
-      ],
-      articles: [
-        {
-          "id": 18,
-          "title": "Now",
-          "content": "dsfsdfsdf",
-          "author": {
-            "id": 1,
-            "name": "Евгений Голубев",
-            "userPicture": "https://lh3.googleusercontent.com/a/AAcHTtczi1vwo2wvg2kljQKuFXt6KVP4d-Yoq0XSyoNySA=s96-c"
-          },
-          "creationDate": "2023-07-01 01:08:25",
-          "imageLinks": []
-        }
-      ],
-      comments: [{
-        id: 1,
-        author: {
-          name: 'Biba',
-          userPicture: "377164d4-8faf-4f31-8c57-9ead5f1bd78f.png",
-        },
-        content: 'blabalblablablalbalblalblablalbalblalb'
-      },
-        {
-          id: 1,
-          author: {
-            name: 'Biba',
-            userPicture: "377164d4-8faf-4f31-8c57-9ead5f1bd78f.png",
-          },
-          content: 'blabalblablablalbalblalblablalbalblalb'
-        }],
+      subscribers: [],
+      subscriptions: [],
+      articles: [],
+      comments: [],
     }
   },
   methods: {
@@ -121,7 +81,7 @@ export default {
       }, {});
     },
     getSubscribers() {
-      AXIOS.get(`/profile/subscribers/${this.userProfile.id}`)
+      AXIOS.get(`/profile/${this.userProfile.id}/subscribers`)
           .then(response => {
             this.subscribers = response.data
           })
@@ -130,7 +90,7 @@ export default {
           })
     },
     getSubscriptions() {
-      AXIOS.get(`/profile/subscriptions/${this.userProfile.id}`)
+      AXIOS.get(`/profile/${this.userProfile.id}/subscriptions`)
           .then(response => {
             this.subscriptions = response.data
           })
