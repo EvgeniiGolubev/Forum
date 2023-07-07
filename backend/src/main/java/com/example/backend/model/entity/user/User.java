@@ -26,6 +26,9 @@ public class User {
     @Column(name="name", nullable = false)
     private String name;
 
+    @Column(name="name", length = 600)
+    private String description;
+
     @Column(name="user_picture")
     private String userPicture;
 
@@ -66,6 +69,7 @@ public class User {
             String email,
             String password,
             String name,
+            String description,
             String userPicture,
             String locale,
             Provider provider,
@@ -75,6 +79,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.name = name;
+        this.description = description;
         this.userPicture = userPicture;
         this.locale = locale;
         this.provider = provider;

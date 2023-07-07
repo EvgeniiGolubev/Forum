@@ -16,28 +16,48 @@ export default {
       alertMessage: null,
     }
   },
-  mounted() {
-    AXIOS.get("/auth/oauth2-success")
-        .then(response => {
-          this.$store.dispatch('loginAction', {
-            authenticate: true,
-            roles: response.data.roles,
-            name: response.data.name,
-            picture: response.data.userPicture,
-            id: response.data.id
-          })
+  methods: {
+    loginUser() {
+      AXIOS.get("/auth/oauth2-success")
+          .then(response => {
+            this.$store.dispatch('loginAction', {
+              authenticate: true,
+              roles: response.data.roles,
+              name: response.data.name,
+              picture: response.data.userPicture,
+              id: response.data.id
+            })
 
-          this.alertMessage = 'You successfully sign in'
-          setTimeout(() => {
-            this.alertMessage = null
-            this.$router.push('/profile')
-          }, 1000)
-        })
-        .catch(error => {
-          if (!Array.isArray(error.response.data)) {
-            this.errors.push(error.response.data)
-          }
-        });
+            this.alertMessage = 'You successfully sign in'
+            setTimeout(() => {
+              this.alertMessage = null
+              this.$router.push('/profile')
+            }, 1000)
+          })
+          .catch(error => {
+            this.handleError(error)
+          })
+    },
+    getUserSubscriptions() {
+      AXIOS.get("/profile/subscriptions")
+          .then(response => {
+            this.$store.dispatch('addSubscriptionAction', response.data)
+          })
+          .catch(error => {
+            this.handleError(error)
+          })
+    },
+    handleError(error) {
+      if (error) {
+        if (!Array.isArray(error.response.data)) {
+          this.errors.push(error.response.data)
+        }
+      }
+    }
+  },
+  mounted() {
+    this.loginUser()
+    this.getUserSubscriptions()
   }
 }
 </script>

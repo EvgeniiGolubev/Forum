@@ -16,11 +16,13 @@
               </div>
               <hr>
               <div class="d-flex justify-content-between align-items-center">
-                <div>
+                <div class="d-flex justify-content-between align-items-center">
                   <input type="button" value="Read" v-on:click="openArticle(article.id)"
                          class="btn btn-outline-primary"/>
-                  <font-awesome-icon :icon="['fas', 'heart']" size="2xl" style="color: #3e6cf4;" class="heart"/>
-                  <span>24</span>
+                  <div>
+                    <font-awesome-icon :icon="['fas', 'heart']" size="2xl" style="color: #3e6cf4;" class="heart"/>
+                    <span>24</span>
+                  </div>
                 </div>
                 <small class="text-body-secondary">{{ formatDateTime(article.creationDate) }}</small>
               </div>
@@ -90,7 +92,7 @@ export default {
 <style scoped>
 .heart {
   margin-left: 15px;
-  margin-right: 5px;
+  margin-right: 10px;
 }
 
 

@@ -8,22 +8,26 @@
         <img class="mb-4" src="/img/logo.png" width="100" height="100"/>
         <h1 class="h3 mb-3 fw-normal">Sign up</h1>
         <div class="form-floating">
-          <input type="email" class="form-control" id="email" placeholder="name@example.com" v-model="email" required>
+          <input type="email" class="form-control" id="email" placeholder="name@example.com" maxlength="255"
+                 v-model="email" required>
           <label for="email">Email address</label>
           <div class="invalid-feedback" >Please provide a valid email address.</div>
         </div>
         <div class="form-floating mt-3">
-          <input type="text" class="form-control" id="name" placeholder="Name" v-model="name" required>
+          <input type="text" class="form-control" id="name" placeholder="Name" maxlength="255"
+                 v-model="name" required>
           <label for="name">Name</label>
           <div class="invalid-feedback" >Please provide a valid name.</div>
         </div>
         <div class="form-floating mt-3">
-          <input type="password" class="form-control" id="password" placeholder="Password" v-model="password" required minlength="1">
+          <input type="password" class="form-control" id="password" placeholder="Password" maxlength="255"
+                 v-model="password" required minlength="1">
           <label for="password">Password</label>
           <div class="invalid-feedback" >Password must be at least 8 characters long.</div>
         </div>
         <div class="form-floating mt-3">
-          <input type="password" class="form-control" id="confirm-password" placeholder="Confirm password" v-model="confirmPassword" required :pattern="password">
+          <input type="password" class="form-control" id="confirm-password" maxlength="255"
+                 placeholder="Confirm password" v-model="confirmPassword" required :pattern="password">
           <label for="confirm-password">Confirm password</label>
           <div class="invalid-feedback" >Passwords must match.</div>
         </div>

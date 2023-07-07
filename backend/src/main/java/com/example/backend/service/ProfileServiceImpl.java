@@ -63,8 +63,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public UserProfileDto updateUserProfile(User owner, UserProfileDto updateUser, MultipartFile image)
-            throws IllegalArgumentException, FileManagerException {
+    public UserProfileDto updateUserProfile(User owner, UserProfileDto updateUser) throws IllegalArgumentException {
 
         if (owner == null) {
             throw new IllegalArgumentException("User cannot be null");
@@ -74,6 +73,16 @@ public class ProfileServiceImpl implements ProfileService {
             throw new IllegalArgumentException("Updated user cannot be null");
         }
 
+
+
+        owner.setName(updateUser.getName());
+        owner.setDescription(updateUser.getDescription());
+
+        return new UserProfileDto(userRepository.save(owner));
+    }
+
+    @Override
+    public void updateUserImage(User owner, MultipartFile image) throws FileManagerException {
         if (image != null) {
             List<String> links = fileStoreService.saveFiles(List.of(image));
 
@@ -81,10 +90,6 @@ public class ProfileServiceImpl implements ProfileService {
                 owner.setUserPicture(links.get(0));
             }
         }
-
-        owner.setName(updateUser.getName());
-
-        return new UserProfileDto(userRepository.save(owner));
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.example.backend.model.dto.profile;
 import com.example.backend.model.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -11,9 +12,17 @@ import java.io.Serializable;
 public class UserProfileDto implements Serializable {
     @JsonProperty("id")
     private Long id;
+
     @JsonProperty("name")
     @NotBlank(message = "Name can not be empty")
+    @Length(max = 255)
     private String name;
+
+    @JsonProperty("name")
+    @NotBlank(message = "Description can not be empty")
+    @Length(max = 600)
+    private String description;
+
     @JsonProperty("userPicture")
     private String userPicture;
 
@@ -22,6 +31,7 @@ public class UserProfileDto implements Serializable {
     public UserProfileDto(User user) {
         this.id = user.getId();
         this.name = user.getName();
+        this.description = user.getDescription();
         this.userPicture = user.getUserPicture();
     }
 

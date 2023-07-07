@@ -5,6 +5,7 @@ import com.example.backend.model.entity.article.Article;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -18,10 +19,12 @@ public class ArticleDto implements Serializable {
 
     @JsonProperty("title")
     @NotBlank(message = "Title can not be empty")
+    @Length(max = 255)
     private String title;
 
     @JsonProperty("content")
     @NotBlank(message = "Content can not be empty")
+    @Length(max = 5000)
     private String content;
 
     @JsonProperty("author")

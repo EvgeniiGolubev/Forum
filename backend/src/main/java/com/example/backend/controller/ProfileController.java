@@ -5,7 +5,6 @@ import com.example.backend.model.dto.user.ChangeUserEmailDto;
 import com.example.backend.model.dto.user.ChangeUserPasswordDto;
 import com.example.backend.model.entity.user.Provider;
 import com.example.backend.model.entity.user.User;
-import com.example.backend.model.response.ResponseMessage;
 import com.example.backend.security.UserDetailsImpl;
 import com.example.backend.security.jwt.JwtUtils;
 import com.example.backend.service.MailSenderService;
@@ -56,24 +55,23 @@ public class ProfileController {
         return new ResponseEntity<>(profile, HttpStatus.OK);
     }
 
-    @GetMapping
-    public ResponseEntity<?> getUserProfile(@AuthenticationPrincipal UserDetailsImpl authenticatedUser) {
-        User owner = userService.getUserFromUserDetails(authenticatedUser);
-
-        UserProfileDto profile = profileService.getUserProfile(owner);
-        return new ResponseEntity<>(profile, HttpStatus.OK);
-    }
-
-    @PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PutMapping
     public ResponseEntity<?> updateUserProfile(
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
-            @Valid @ModelAttribute UserProfileDto user,
-            @RequestPart(name = "image", required = false) MultipartFile image
+            @Valid @RequestBody UserProfileDto user
     ) {
         User owner = userService.getUserFromUserDetails(authenticatedUser);
 
-        UserProfileDto updatedProfile = profileService.updateUserProfile(owner, user, image);
+        UserProfileDto updatedProfile = profileService.updateUserProfile(owner, user);
         return new ResponseEntity<>(updatedProfile, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/update-image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> updateUserImage(
+            @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
+            @RequestPart(name = "image", required = false) MultipartFile image
+    ) {
+        return null;
     }
 
     @DeleteMapping
@@ -90,9 +88,9 @@ public class ProfileController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/subscriptions")
-    public ResponseEntity<?> getUserSubscriptions(@AuthenticationPrincipal UserDetailsImpl authenticatedUser) {
-        User owner = userService.getUserFromUserDetails(authenticatedUser);
+    @GetMapping("/subscriptions/{profileId}")
+    public ResponseEntity<?> getUserSubscriptions(@PathVariable("profileId") Long profileId) {
+        User owner = userService.findUserById(profileId);
 
         List<UserProfileDto> subscriptions = profileService.getUserSubscriptions(owner);
         return new ResponseEntity<>(subscriptions, HttpStatus.OK);
@@ -111,9 +109,9 @@ public class ProfileController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/subscribers")
-    public ResponseEntity<?> getUserSubscribers(@AuthenticationPrincipal UserDetailsImpl authenticatedUser) {
-        User owner = userService.getUserFromUserDetails(authenticatedUser);
+    @GetMapping("/subscribers/{profileId}")
+    public ResponseEntity<?> getUserSubscribers(@PathVariable("profileId") Long profileId) {
+        User owner = userService.findUserById(profileId);
 
         List<UserProfileDto> subscribers = profileService.getUserSubscribers(owner);
         return new ResponseEntity<>(subscribers, HttpStatus.OK);

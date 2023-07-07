@@ -4,12 +4,13 @@
   <div class="card text-center bg-card">
     <form ref="form" @submit="submitForm" class="needs-validation m-3" novalidate>
       <div class="form-floating">
-        <input type="text" class="form-control" id="floatingInput" v-model="title" required>
+        <input type="text" class="form-control" id="floatingInput" maxlength="255" v-model="title" required>
         <label for="floatingInput">Title</label>
         <div class="invalid-feedback" >Title can not be empty.</div>
       </div>
       <div class="form-floating mt-3">
-        <textarea class="form-control" rows="3" id="content" v-model="content" required style="height: 300px;"></textarea>
+        <textarea class="form-control" rows="3" id="content" v-model="content"  maxlength="5000" required style="height: 300px;">
+        </textarea>
         <label for="content">Content</label>
         <div class="invalid-feedback">Content can not be empty.</div>
       </div>

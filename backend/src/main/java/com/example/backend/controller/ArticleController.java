@@ -46,6 +46,12 @@ public class ArticleController {
         return new ResponseEntity<>(articles, HttpStatus.OK);
     }
 
+    @GetMapping("/author/{authorId}")
+    public ResponseEntity<?> findArticlesByAuthor(@PathVariable("authorId") Long authorId) {
+        //todo to do!
+        return null;
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findArticleById(@PathVariable("id") Long id) {
         ArticleDto article = articleService.findArticleById(id);

@@ -53,24 +53,8 @@
       </div>
     </div>
   </main>
-  <div class="container" v-if="commentsOpen">
-    <div class="card my-3 p-3 bg-body rounded shadow-sm">
-      <h5 class="border-bottom pb-2 mb-0 text-md-start">Comments</h5>
-      <div class="d-flex text-body-secondary pt-3" v-for="comment in comments" :key="comment.id">
-        <img :src="getImagePath(comment.author.userPicture)" class="bd-placeholder-img flex-shrink-0 me-2 rounded" style="width: 50px; height: 50px;">
-        <p class="pb-3 mb-0 lh-sm border-bottom text-md-start">
-          <strong class="d-block text-gray-dark">{{ comment.author.name }}</strong>
-          {{ comment.comment }}
-        </p>
-      </div>
-      <hr>
-      <div class="d-flex text-body-secondary pt-3">
-        <textarea class="form-control" rows="2" v-model="newComment"></textarea>
-        <input type="button" value="Submit сomment" v-on:click="submitComment(article.id)"
-               class="btn btn-outline-primary" style="height: 40px; margin-left: 25px;"/>
-      </div>
-    </div>
-  </div>
+
+  <comments-list v-bind:comments="comments" v-bind:article-id="article.id" @new-comment="newCommentAdded" v-if="commentsOpen"/>
 
 </template>
 
@@ -82,17 +66,17 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import ErrorsView from "@/components/ErrorsView.vue";
+import CommentsList from "@/components/CommentsList.vue";
 
 library.add(fas, far)
 
 export default {
-  components: {ErrorsView, ArticleForm, FontAwesomeIcon},
+  components: {CommentsList, ErrorsView, ArticleForm, FontAwesomeIcon},
   data() {
     return {
       errors: [],
       article: null,
       comments: [],
-      newComment: '',
       visibleForm: false,
       showCarousel: true,
       articleLiked: false,
@@ -115,7 +99,7 @@ export default {
           })
     },
     openComments(articleId) {
-      AXIOS.get(`/comments/${articleId}`)
+      AXIOS.get(`/comments/article/${articleId}`)
           .then(response => {
             this.comments = response.data
           })
@@ -123,16 +107,6 @@ export default {
             this.handleError(error)
           })
       this.commentsOpen = !this.commentsOpen
-    },
-    submitComment(articleId) {
-      AXIOS.post(`/comments/${articleId}`, {newComment: this.newComment})
-          .then(response => {
-            let index = this.comments.findIndex(item => item.id === response.data.id)
-            this.comments.splice(index, 1, response.data);
-          })
-          .catch(error => {
-            this.handleError(error)
-          })
     },
     likeArticle(articleId) {
       console.log(articleId)
@@ -160,6 +134,10 @@ export default {
     },
     editArticle() {
       this.visibleForm = !this.visibleForm
+    },
+    newCommentAdded(comment) {
+      let index = this.comments.findIndex(item => item.id === comment.id)
+      this.comments.splice(index, 1, comment);
     },
     getImagePath(link) {
       if (link && typeof link === 'string') {

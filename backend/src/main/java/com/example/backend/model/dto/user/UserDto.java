@@ -4,6 +4,7 @@ import com.example.backend.model.entity.user.Role;
 import com.example.backend.model.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -21,7 +22,13 @@ public class UserDto implements Serializable {
 
     @JsonProperty("name")
     @NotBlank(message = "Name can not be empty")
+    @Length(max = 255)
     private String name;
+
+    @JsonProperty("name")
+    @NotBlank(message = "Description can not be empty")
+    @Length(max = 600)
+    private String description;
 
     @JsonProperty("userPicture")
     private String userPicture;
@@ -44,6 +51,7 @@ public class UserDto implements Serializable {
         this.id = user.getId();
         this.email = user.getEmail();
         this.name = user.getName();
+        this.description = user.getDescription();
         this.userPicture = user.getUserPicture();
         this.locale = user.getLocale();
         this.provider = user.getProvider().name();
