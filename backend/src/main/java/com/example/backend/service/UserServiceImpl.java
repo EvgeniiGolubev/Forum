@@ -115,6 +115,7 @@ public class UserServiceImpl implements UserService {
                 newUserDto.getName(),
                 null,
                 null,
+                null,
                 Provider.LOCAL,
                 Status.ACTIVE,
                 Collections.singleton(Role.USER)

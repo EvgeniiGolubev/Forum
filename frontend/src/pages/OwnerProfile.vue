@@ -2,12 +2,7 @@
   <errors-view v-bind:errors="errors"/>
 
   <main class="container">
-    <div class="d-flex justify-content-between align-items-center my-2" role="group" v-if="!isProfileOwner">
-      <button type="button" class="btn btn-outline-primary mx-2" @click="unsubscribe()" v-if="isSubscribed">Unsubscribe</button>
-      <button type="button" class="btn btn-outline-primary" @click="subscribe" v-else>Subscribe</button>
-    </div>
-
-    <div class="card mb-3">
+    <div class="card mb-3" v-if="profile">
       <div class="row g-0">
         <div class="col-md-4" style="min-width: 300px">
           <div class="container mt-1 mb-1 ms-1" style="height: 300px; width: 300px; position: relative;"
@@ -33,17 +28,18 @@
         <div class="col-md-8">
           <div class="card-body text-md-start">
             <div class="d-flex">
-              <h5 class="card-title" style="margin-right: 10px;">{{ profile.name }}</h5>
+              <p class="card-text me-2"><strong>Name</strong></p>
               <a data-bs-toggle="collapse" href="#collapseNewName" role="button" aria-expanded="false"
-                 aria-controls="collapseNewName" v-if="isProfileOwner">
+                 aria-controls="collapseNewName">
                 <font-awesome-icon :icon="['fas', 'pen']" style="color: #3e6cf4;"/>
               </a>
             </div>
+            <h5 class="card-title">{{ profile.name }}</h5>
             <div class="collapse m-2" id="collapseNewName">
               <div class="card card-body">
                 <form ref="form" @submit="changeProfile" class="needs-validation" novalidate>
                   <div class="form-floating">
-                    <input type="text" class="form-control" id="newNameInput" v-model="profile.name" maxlength="255" required>
+                    <input type="text" class="form-control" id="newNameInput" v-model="newName" maxlength="255" required>
                     <label for="newNameInput">New name</label>
                     <div class="invalid-feedback">Name can not be empty.</div>
                   </div>
@@ -53,18 +49,19 @@
               </div>
             </div>
 
-            <div class="d-flex align-items-center me-3">
-              <p class="card-text me-2 mt-3">{{ profile.description }}</p>
+            <div class="d-flex align-items-center">
+              <p class="card-text me-2 mt-3"><strong>Description</strong></p>
               <a data-bs-toggle="collapse" href="#collapseNewDescription" role="button" aria-expanded="false"
-                 aria-controls="collapseNewDescription" v-if="isProfileOwner">
+                 aria-controls="collapseNewDescription">
                 <font-awesome-icon :icon="['fas', 'pen']" style="color: #3e6cf4; margin: 0"/>
               </a>
             </div>
+            <p class="card-text">{{ profile.description }}</p>
             <div class="collapse m-2" id="collapseNewDescription">
               <div class="card card-body">
                 <form ref="form" @submit="changeProfile" class="needs-validation" novalidate>
                   <div class="form-floating">
-                    <textarea type="text" class="form-control" id="newDescriptionInput" rows="2" v-model="profile.description"
+                    <textarea type="text" class="form-control" id="newDescriptionInput" rows="2" v-model="newDescription"
                               maxlength="600" required/>
                     <label for="newDescriptionInput">New description</label>
                     <div class="invalid-feedback">Description can not be empty.</div>
@@ -75,7 +72,7 @@
               </div>
             </div>
 
-            <div v-if="isProfileOwner" style="padding-left: 8px">
+            <div style="padding-left: 8px">
               <div class="row">
                 <button type="button" style="width: 200px;" class="btn btn-outline-primary m-1"
                         data-bs-toggle="collapse"
@@ -86,17 +83,17 @@
                   <div class="card card-body">
                     <p>A confirmation email will be sent to the address provided. Until confirmation, you will not be
                       able to enter the site under your account!</p>
-                    <form ref="form" @submit="changeEmail" class="needs-validation" novalidate>
+                    <form ref="emailForm" @submit.prevent="changeEmail" class="needs-validation" novalidate>
                       <div class="form-floating">
                         <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com"
-                               v-model="newEmail" required>
+                               v-model="newEmail" autocomplete="email" required>
                         <label for="floatingInput">New email address</label>
                         <div class="invalid-feedback">Please provide a valid email address.</div>
                       </div>
                       <div class="form-floating mt-3">
-                        <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
-                               v-model="password" required minlength="1">
-                        <label for="floatingPassword">Password</label>
+                        <input type="password" class="form-control" id="currentPassword" placeholder="Password"
+                               v-model="password" autocomplete="current-password" required minlength="1">
+                        <label for="currentPassword">Password</label>
                         <div class="invalid-feedback">Password must be at least 8 characters long.</div>
                       </div>
                       <button class="btn btn-primary mt-3">Change email</button>
@@ -113,22 +110,22 @@
                 </button>
                 <div class="collapse m-2" id="collapseNewPassword">
                   <div class="card card-body">
-                    <form ref="form" @submit="changePassword" class="needs-validation" novalidate>
+                    <form ref="passwordForm" @submit.prevent="changePassword" class="needs-validation" novalidate>
                       <div class="form-floating mt-3">
                         <input type="password" class="form-control" id="old-password" placeholder="Password"
-                               v-model="oldPassword" required minlength="1">
+                               v-model="oldPassword" autocomplete="current-password" required minlength="1">
                         <label for="password">Old password</label>
                         <div class="invalid-feedback">Password must be at least 8 characters long.</div>
                       </div>
                       <div class="form-floating mt-3">
                         <input type="password" class="form-control" id="password" placeholder="Password"
-                               v-model="password" required minlength="1">
+                               v-model="password" autocomplete="new-password" required minlength="1">
                         <label for="password">New password</label>
                         <div class="invalid-feedback">Password must be at least 8 characters long.</div>
                       </div>
                       <div class="form-floating mt-3">
                         <input type="password" class="form-control" id="confirm-password" placeholder="Confirm password"
-                               v-model="confirmPassword" required :pattern="password">
+                               v-model="confirmPassword" autocomplete="confirm-new-password" required :pattern="password">
                         <label for="confirm-password">Confirm new password</label>
                         <div class="invalid-feedback">Passwords must match.</div>
                       </div>
@@ -144,7 +141,7 @@
       </div>
     </div>
 
-    <user-profile-activity v-bind:user-profile="profile" v-bind:is-profile-owner="isProfileOwner" @errors="handleError"/>
+    <user-profile-activity v-bind:user-profile="profile" v-bind:is-profile-owner="true" @errors="handleError" v-if="profile"/>
   </main>
 </template>
 
@@ -164,41 +161,47 @@ export default {
   data() {
     return {
       errors: [],
-      profile: null,
+      profileId: -1,
+      profile: {
+        "id": 2,
+        "name": "Ivanka",
+        "description": "Я Иванка багуганка",
+        "userPicture": "b05fb0af-ef7f-4b76-8a37-5410be382b65.jpg"
+      },
+      newName: '',
+      newDescription: '',
       oldPassword: '',
       password: '',
       confirmPassword: '',
       newEmail: '',
-      spinnerVisible: false,
-      isProfileOwner: false,
       showUploadButton: false,
-      isSubscribed: false,
+      spinnerVisible: false,
     }
   },
   methods: {
-    getProfileById(profileId) {
-      AXIOS.get(`/profile/${profileId}`)
+    getProfileById() {
+      AXIOS.get(`/profile/${this.profileId}`)
           .then(response => {
             this.profile = response.data
+            this.newName = response.data.name
+            this.newDescription = response.data.description
           })
           .catch(error => {
             this.handleError(error)
           })
     },
-    changeProfile(event) {
-      event.preventDefault()
-
+    changeProfile() {
       const form = this.$refs.form;
       if (!form.checkValidity()) {
         return;
       }
 
       const updatedProfile = {
-        name: this.profile.name,
-        description: this.profile.description
+        name: this.newName,
+        description: this.newDescription
       }
 
-      AXIOS.put(`/profile/${this.profile.id}`, updatedProfile)
+      AXIOS.put(`/profile/${this.profileId}`, updatedProfile)
           .then(response => {
             this.profile = response.data
             this.$store.dispatch('changeNameAction', response.data.name)
@@ -207,6 +210,8 @@ export default {
             this.handleError(error)
           })
 
+      this.newName = ''
+      this.newDescription = ''
     },
     changeImageProfile() {
       this.spinnerVisible = true
@@ -218,7 +223,7 @@ export default {
         'Content-Type': 'multipart/form-data'
       }
 
-      AXIOS.put(`/profile/${this.profile.id}/update-image`, formData, {headers: headers})
+      AXIOS.put(`/profile/${this.profileId}/update-image`, formData, {headers: headers})
           .then(response => {
             this.profile = response.data
             this.spinnerVisible = false
@@ -228,10 +233,8 @@ export default {
             this.handleError(error)
           })
     },
-    changeEmail(event) {
-      event.preventDefault()
-
-      const form = this.$refs.form;
+    changeEmail() {
+      const form = this.$refs.emailForm;
       if (!form.checkValidity()) {
         return;
       }
@@ -241,21 +244,22 @@ export default {
         password: this.password
       }
 
-      AXIOS.put(`/profile/${this.profile.id}/change-email`, newEmail)
+      AXIOS.put(`/profile/${this.profileId}/change-email`, newEmail)
           .then(response => {
-            console.log(response)
+            console.log(response.data)
+            this.$store.dispatch('logoutAction')
+            this.$router.push('/login')
           })
           .catch(error => {
+            console.log(error.response.data)
             this.handleError(error)
           })
 
       this.newEmail = ''
       this.password = ''
     },
-    changePassword(event) {
-      event.preventDefault()
-
-      const form = this.$refs.form;
+    changePassword() {
+      const form = this.$refs.passwordForm;
       if (!form.checkValidity()) {
         return;
       }
@@ -265,9 +269,12 @@ export default {
         newPassword: this.password,
         confirmPassword: this.confirmPassword
       }
-      AXIOS.put(`/profile/${this.profile.id}/change-password`, newPassword)
+
+      AXIOS.put(`/profile/${this.profileId}/change-password`, newPassword)
           .then(response => {
             console.log(response)
+            this.$store.dispatch('logoutAction')
+            this.$router.push('/login')
           })
           .catch(error => {
             this.handleError(error)
@@ -277,20 +284,8 @@ export default {
       this.password = ''
       this.confirmPassword = ''
     },
-    subscribe() {
-      AXIOS.post(`/profile/${this.profile.id}/subscriptions`, {}, {params: {subscriptionStatus: true}})
-          .catch(error => {
-            this.handleError(error)
-          })
-    },
-    unsubscribe() {
-      AXIOS.post(`/profile/${this.profile.id}/subscriptions`, {}, {params: {subscriptionStatus: false}})
-          .catch(error => {
-            this.handleError(error)
-          })
-    },
     handleFileChange(event) {
-      const maxFileSize = 5 * 1024 * 1024; // Максимальный размер файла (5 МБ)
+      const maxFileSize = 5 * 1024 * 1024;
 
       for (let file of event.target.files) {
         if (file.size > maxFileSize) {
@@ -338,26 +333,9 @@ export default {
       }, false);
     });
 
-    let profileId = this.$route.params.id
-
-    if (profileId) {
-      this.getProfileById(profileId)
-
-      if (profileId === this.$store.getters.getId) {
-        this.isProfileOwner = true
-      } else {
-        this.isProfileOwner = false
-
-        const subscriptions = this.$store.getters.getUserSubscriptions
-        const id = subscriptions.find(user => user.id === profileId)
-        this.isSubscribed = !!id;
-      }
-    } else {
-      profileId = this.$store.getters.getId
-      this.getProfileById(profileId)
-      this.isProfileOwner = true
-    }
-  },
+    this.profileId = this.$store.getters.getId
+    this.getProfileById()
+  }
 }
 </script>
 

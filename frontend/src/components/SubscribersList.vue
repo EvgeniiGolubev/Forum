@@ -5,14 +5,10 @@
       <div class="d-flex justify-content-between align-items-center pt-3" v-for="subscriber in subscribers" :key="subscriber.id">
         <div class="d-flex align-items-center">
           <img :src="getImagePath(subscriber.userPicture)" class="bd-placeholder-img flex-shrink-0 me-2 rounded" style="width: 50px; height: 50px;">
-          <strong class="d-block text-gray-dark">{{ subscriber.name }}</strong>
+          <a href="#" class="btn btn-link text-without-underline" v-on:click="openProfile(subscriber.id)">{{ subscriber.name }}</a>
         </div>
         <div v-if="isProfileOwner">
-          <button type="button" class="btn btn-outline-danger mx-2" @click="changeSubscriberStatus(subscriber.id, false)"
-                  v-if="isSubscribed(subscriber.id)">
-            Unsubscribe
-          </button>
-          <button type="button" class="btn btn-outline-primary" @click="changeSubscriberStatus(subscriber.id, true)" v-else>
+          <button type="button" class="btn btn-outline-primary" @click="changeSubscriberStatus(subscriber.id)" v-if="!isSubscribed(subscriber.id)">
             Subscribe
           </button>
         </div>
@@ -25,17 +21,30 @@
 import {AXIOS} from "@/http-commons";
 
 export default {
-  props: ['subscribers', 'isProfileOwner'],
+  props: ['subscribers', 'isProfileOwner', 'subscriptions'],
   methods: {
-    changeSubscriberStatus(id, status) {
-      AXIOS.post(`/profile/subscribers/${id}?subscriberStatus=${status}`)
+    openProfile(id) {
+      this.$router.push({name: 'UserProfile', params: {id: id}});
+    },
+    changeSubscriberStatus(subscriberId) {
+      const id = this.$store.getters.getId
+      AXIOS.post(`/profile/${id}/subscribers/${subscriberId}?subscriberStatus=${true}`)
+          .then(response => {
+            console.log(response.data)
+            window.location.reload()
+          })
           .catch(error => {
             this.$emit('errors', error);
           })
     },
     isSubscribed(id) {
-      const subscriptions = this.$store.getters.getUserSubscriptions
-      return subscriptions.some(subscriber => subscriber.id === id)
+      for (let user of this.subscriptions) {
+        if (user.id === id) {
+          return true
+        }
+      }
+
+      return false
     },
     getImagePath(link) {
       if (link && typeof link === 'string') {
@@ -53,5 +62,7 @@ export default {
 </script>
 
 <style scoped>
-
+.text-without-underline {
+  text-decoration: none;
+}
 </style>

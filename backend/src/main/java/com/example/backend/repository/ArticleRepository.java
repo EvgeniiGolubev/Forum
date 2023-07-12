@@ -1,6 +1,7 @@
 package com.example.backend.repository;
 
 import com.example.backend.model.entity.article.Article;
+import com.example.backend.model.entity.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,9 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Long>  {
     Page<Article> findAll(Pageable pageable);
+
+    List<Article> findAllByAuthor(User author);
 
     Page<Article> findByTitleContaining(String searchQuery, Pageable pageable);
 

@@ -9,7 +9,6 @@
           {{ comment.content }}
         </p>
       </div>
-      <hr>
       <div class="d-flex text-body-secondary pt-3" v-if="articleId">
         <textarea class="form-control" rows="2" v-model="newComment" maxlength="600"></textarea>
         <input type="button" value="Submit comment" v-on:click="submitComment(articleId)"
@@ -50,6 +49,16 @@ export default {
       }
 
       return '/img/icon/paw.png';
+    },
+    handleError(error) {
+      this.spinnerVisible = false
+
+      if (error) {
+        console.log(error)
+        if (!Array.isArray(error.response.data)) {
+          this.errors.push(error.response.data)
+        }
+      }
     },
   }
 }

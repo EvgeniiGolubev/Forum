@@ -5,8 +5,7 @@ const state = {
     role: localStorage.getItem('user-role') || '',
     name: localStorage.getItem('user-name') || '',
     picture: localStorage.getItem('user-picture') || '',
-    id: localStorage.getItem('user-id') || '',
-    subscriptions: localStorage.getItem('user-subscriptions') || [],
+    id: localStorage.getItem('user-id') || null,
 }
 
 const getters = {
@@ -26,10 +25,7 @@ const getters = {
         return state.picture
     },
     getId: state => {
-        return state.id
-    },
-    getUserSubscriptions: state => {
-        return state.subscriptions
+        return Number(state.id)
     }
 }
 
@@ -79,22 +75,19 @@ const mutations = {
         state.name =''
         state.picture = ''
         state.id = ''
-        state.subscriptions = []
         localStorage.removeItem("user-authenticate")
         localStorage.removeItem("user-role")
         localStorage.removeItem("user-name")
         localStorage.removeItem("user-picture")
         localStorage.removeItem("user-id")
-        localStorage.removeItem("user-subscriptions")
     },
     changeNameMutation: (state, name) => {
         state.name = name
+        localStorage.setItem('user-name', name)
     },
     changePictureMutation: (state, picture) => {
         state.picture = picture
-    },
-    addSubscriptionMutation: (state, subscriptions) => {
-        state.subscriptions = subscriptions
+        localStorage.setItem('user-picture', picture)
     }
 }
 
@@ -110,9 +103,6 @@ const actions = {
     },
     changePictureAction: (context, picture) => {
         context.commit('changePictureMutation', picture)
-    },
-    addSubscriptionAction: (context, subscriptions) => {
-        context.commit('addSubscriptionMutation', subscriptions)
     }
 }
 

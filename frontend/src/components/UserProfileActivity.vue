@@ -34,7 +34,7 @@
     </div>
 
     <div class="card-body" v-if="visibleSections.subscribers">
-      <subscribers-list v-bind:subscribers="subscribers" v-bind:is-profile-owner="isProfileOwner"/>
+      <subscribers-list v-bind:subscribers="subscribers" v-bind:subscriptions="subscriptions" v-bind:is-profile-owner="isProfileOwner"/>
     </div>
 
     <div class="card-body" v-if="visibleSections.subscriptions">

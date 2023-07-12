@@ -4,8 +4,8 @@
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
 
         <div class="col" v-for="article in articles" :key="article.id" >
-          <div class="card shadow-sm" style="max-height: 600px; padding-top: 5px;">
-            <img :src="getImagePath(article.imageLinks[0])" class="bd-placeholder-img card-img-top" style="object-fit: contain; height: 300px;">
+          <div class="card shadow-sm" style="padding-top: 10px;">
+            <img :src="getImagePath(article.imageLinks[0])" class="bd-placeholder-img card-img-top" style="object-fit: contain; max-height: 300px; height: 300px;">
             <div class="card-body">
               <h4 class="card-title text-md-start">{{ article.title }}</h4>
               <p class="card-text text-md-start">{{ truncateText(article.content) }}</p>
@@ -58,7 +58,7 @@ export default {
       if (!this.$store.getters.isAuthenticated) {
         this.$router.push('/login')
       } else {
-        this.$router.push({name: 'ProfileComponent', params: {id: authorId}});
+        this.$router.push({name: 'UserProfile', params: {id: authorId}});
       }
     },
     getImagePath(link) {

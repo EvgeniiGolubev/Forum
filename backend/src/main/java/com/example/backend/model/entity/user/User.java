@@ -26,8 +26,8 @@ public class User {
     @Column(name="name", nullable = false)
     private String name;
 
-    @Column(name="name", length = 600)
-    private String description;
+    @Column(name="description", length = 600)
+    private String description = "Empty description";
 
     @Column(name="user_picture")
     private String userPicture;

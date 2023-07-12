@@ -25,7 +25,7 @@ public class UserDto implements Serializable {
     @Length(max = 255)
     private String name;
 
-    @JsonProperty("name")
+    @JsonProperty("description")
     @NotBlank(message = "Description can not be empty")
     @Length(max = 600)
     private String description;

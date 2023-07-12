@@ -40,11 +40,13 @@ export default {
     return {
       email: '',
       password: '',
-      errors: [],
+      errors: []
     }
   },
   methods: {
-    submitForm() {
+    submitForm(event) {
+      event.preventDefault()
+
       const form = this.$refs.form;
       if (!form.checkValidity()) {
         return;
@@ -64,18 +66,10 @@ export default {
               roles: response.data.roles,
               name: response.data.name,
               picture: response.data.userPicture,
-              id: response.data.id
+              id: response.data.id,
             })
 
-            this.$router.push('/profile')
-          })
-          .catch(error => {
-            this.handleError(error)
-          })
-
-      AXIOS.get("/profile/subscriptions")
-          .then(response => {
-            this.$store.dispatch('addSubscriptionAction', response.data)
+            this.$router.push('/my-profile')
           })
           .catch(error => {
             this.handleError(error)

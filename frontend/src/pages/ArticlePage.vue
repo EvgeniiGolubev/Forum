@@ -120,7 +120,7 @@ export default {
       }
     },
     openAuthorProfile(authorId) {
-      this.$router.push({name: 'ProfileComponent', params: {id: authorId}});
+      this.$router.push({name: 'UserProfile', params: {id: authorId}});
     },
     deleteArticle(id) {
       AXIOS.delete(`/articles/${id}`)

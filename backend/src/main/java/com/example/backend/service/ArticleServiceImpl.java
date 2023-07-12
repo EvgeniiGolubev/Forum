@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -42,6 +43,17 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         return articles.map(ArticleDto::new);
+    }
+
+    @Override
+    public List<ArticleDto> findAllArticlesByAuthor(User author) throws IllegalArgumentException {
+        if (author == null) {
+            throw new IllegalArgumentException("Author cannot be null");
+        }
+
+        List<Article> articles = articleRepository.findAllByAuthor(author);
+
+        return articles.stream().map(ArticleDto::new).collect(Collectors.toList());
     }
 
     @Override

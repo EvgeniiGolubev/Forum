@@ -77,6 +77,11 @@ export default {
           .then(response => {
             console.log(response.data)
             this.alertMessage = 'An account confirmation message has been sent to your email.'
+
+            setTimeout(() => {
+              this.alertMessage = null
+              this.$router.push('/main')
+            }, 5000)
           })
           .catch(error => {
             if (!Array.isArray(error.response.data)) {

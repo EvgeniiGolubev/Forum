@@ -4,7 +4,8 @@ import RegisterPage from "@/pages/auth/RegisterPage.vue";
 import ConfirmEmail from "@/pages/auth/ConfirmEmail.vue";
 import Oauth2Success from "@/pages/auth/Oauth2Success.vue";
 import MainComponent from "@/pages/MainComponent.vue";
-import ProfileComponent from "@/pages/ProfileComponent.vue";
+import UserProfile from "@/pages/UserProfile.vue";
+import OwnerProfile from "@/pages/OwnerProfile.vue";
 import UsersComponent from "@/pages/UsersComponent.vue";
 import ArticlePage from "@/pages/ArticlePage.vue";
 import CreateArticlePage from "@/pages/CreateArticlePage.vue";
@@ -18,7 +19,8 @@ const router = createRouter({
         { path: '/registration', name: 'RegisterPage', component: RegisterPage },
         { path: '/confirm-email', name: 'ConfirmEmail', component: ConfirmEmail },
         { path: '/registration/oauth2-success', name: 'Oauth2Success', component: Oauth2Success },
-        { path: '/profile/:id?', name: 'ProfileComponent', component: ProfileComponent },
+        { path: '/profile/:id', name: 'UserProfile', component: UserProfile },
+        { path: '/my-profile', name: 'OwnerProfile', component: OwnerProfile },
         { path: '/users', name: 'UsersComponent', component: UsersComponent },
         { path: '/article/:id', name: 'ArticlePage', component: ArticlePage },
         { path: '/create-article', name: 'CreateArticlePage', component: CreateArticlePage },

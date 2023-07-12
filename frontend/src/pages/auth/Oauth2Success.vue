@@ -29,19 +29,11 @@ export default {
             })
 
             this.alertMessage = 'You successfully sign in'
+
             setTimeout(() => {
               this.alertMessage = null
-              this.$router.push('/profile')
+              this.$router.push('/my-profile')
             }, 1000)
-          })
-          .catch(error => {
-            this.handleError(error)
-          })
-    },
-    getUserSubscriptions() {
-      AXIOS.get("/profile/subscriptions")
-          .then(response => {
-            this.$store.dispatch('addSubscriptionAction', response.data)
           })
           .catch(error => {
             this.handleError(error)
@@ -57,7 +49,6 @@ export default {
   },
   mounted() {
     this.loginUser()
-    this.getUserSubscriptions()
   }
 }
 </script>

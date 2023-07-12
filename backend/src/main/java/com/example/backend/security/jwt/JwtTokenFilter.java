@@ -28,14 +28,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final JwtTokenProvider jwtProvider;
 
+    private final JwtUtils jwtUtils;
+
     @Value("${jwt.cookieName}")
     private String authCookieName;
 
     @Autowired
     public JwtTokenFilter(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService,
-                          JwtTokenProvider jwtProvider) {
+                          JwtTokenProvider jwtProvider,
+                          JwtUtils jwtUtils) {
         this.userDetailsService = userDetailsService;
         this.jwtProvider = jwtProvider;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -56,7 +60,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             }
         } catch (JwtAuthenticationException e) {
             SecurityContextHolder.clearContext();
-            response.sendError(e.getHttpStatus().value());
+            Cookie cookie = jwtUtils.clearCookie();
+            response.addCookie(cookie);
 
             LOGGER.error("User is trying to log in with invalid or expired Jwt token! Exception: " + e.getMessage());
             throw new JwtAuthenticationException("Jwt token is expired or invalid", HttpStatus.FORBIDDEN);

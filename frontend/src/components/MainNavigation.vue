@@ -13,7 +13,7 @@
             <router-link class="nav-link px-2 text-blue" to="/">Main</router-link>
           </li>
           <li>
-            <router-link class="nav-link px-2 text-blue" to="/profile" v-if="isVisible">Profile</router-link>
+            <router-link class="nav-link px-2 text-blue" to="/my-profile" v-if="isVisible">Profile</router-link>
           </li>
           <li>
             <router-link class="nav-link px-2 text-blue" to="/create-article" v-if="isVisible">Create new article</router-link>
@@ -29,31 +29,51 @@
           <div class="name mx-3">
             <span>{{ name }}</span>
           </div>
-          <a href="#" class="d-block link-dark text-decoration-none" @click="toggleDropdown">
-            <div v-if="picture !== null">
-              <img :src="picture" alt="user-pic" width="42" height="42" class="rounded-circle"/>
-            </div>
-            <div v-else>
-              <font-awesome-icon :icon="['far', 'user']" size="2xl" class="py-1"/>
-            </div>
-          </a>
-          <ul class="dropdown-menu text-small show drop" data-popper-placement="bottom-start" v-show="showDropdown">
-            <li>
-              <router-link class="dropdown-item" to="/profile">Profile</router-link>
-            </li>
-            <li>
-              <router-link class="dropdown-item" to="/create-article">Creat new article</router-link>
-            </li>
-            <li>
-              <router-link class="dropdown-item" to="/activity-feed">Activity Feed</router-link>
-            </li>
-            <li>
-              <hr class="dropdown-divider"/>
-            </li>
-            <li>
-              <a href="/logout" class="dropdown-item" v-on:click="logout">Sign out</a>
-            </li>
-          </ul>
+          <div class="dropdown text-end">
+            <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown"
+               aria-expanded="false">
+              <img :src="userPicture()" alt="user-pic" width="42" height="42" class="rounded-circle"/>
+            </a>
+            <ul class="dropdown-menu text-small">
+              <li>
+                <router-link class="dropdown-item" to="/my-profile">Profile</router-link>
+              </li>
+              <li>
+                <router-link class="dropdown-item" to="/create-article">Creat new article</router-link>
+              </li>
+              <li>
+                <router-link class="dropdown-item" to="/activity-feed">Activity Feed</router-link>
+              </li>
+              <li>
+                <hr class="dropdown-divider"/>
+              </li>
+              <li>
+                <a href="/logout" class="dropdown-item" v-on:click="logout">Sign out</a>
+              </li>
+            </ul>
+          </div>
+<!--          <a href="#" class="d-block link-dark text-decoration-none" @click="toggleDropdown">-->
+<!--            <div>-->
+<!--              <img :src="userPicture()" alt="user-pic" width="42" height="42" class="rounded-circle"/>-->
+<!--            </div>-->
+<!--          </a>-->
+<!--          <ul class="dropdown-menu text-small show drop" data-popper-placement="bottom-start" v-show="showDropdown">-->
+<!--            <li>-->
+<!--              <router-link class="dropdown-item" to="/my-profile">Profile</router-link>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--              <router-link class="dropdown-item" to="/create-article">Creat new article</router-link>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--              <router-link class="dropdown-item" to="/activity-feed">Activity Feed</router-link>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--              <hr class="dropdown-divider"/>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--              <a href="/logout" class="dropdown-item" v-on:click="logout">Sign out</a>-->
+<!--            </li>-->
+<!--          </ul>-->
         </div>
         <div class="text-end" v-else>
           <router-link class="btn btn-outline-primary me-2" to="/login">Sign in</router-link>
@@ -65,17 +85,10 @@
 </template>
 
 <script>
-import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome"
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { far } from '@fortawesome/free-regular-svg-icons'
-
-library.add(fas, far)
 export default {
-  components: {FontAwesomeIcon},
   data() {
     return {
-      showDropdown: false,
+      // showDropdown: false,
     }
   },
   computed: {
@@ -93,25 +106,26 @@ export default {
 
       return 'User name'
     },
-    picture() {
-      let picture = this.$store.getters.getPicture
-      if (picture) {
+  },
+  methods: {
+    // toggleDropdown() {
+    //   this.showDropdown = !this.showDropdown
+    // },
+    logout() {
+      this.$store.dispatch('logoutAction')
+    },
+    userPicture() {
+      const picture = this.$store.getters.getPicture
+
+      if (picture !== null) {
         if (picture.startsWith('https://')) {
           return picture
         } else {
           return `/img/${picture}`
         }
+      } else {
+        return `/img/icon/cat.png`
       }
-
-      return null
-    }
-  },
-  methods: {
-    toggleDropdown() {
-      this.showDropdown = !this.showDropdown
-    },
-    logout() {
-      this.$store.dispatch('logoutAction')
     }
   }
 }
@@ -120,8 +134,8 @@ export default {
 <style>
 .drop {
   position: absolute;
-  inset: 0px auto auto 0px;
-  margin: 0px;
+  inset: 0 auto auto 0;
+  margin: 0;
   transform: translate(40px, 50px);
 }
 .name {

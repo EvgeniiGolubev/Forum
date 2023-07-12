@@ -48,8 +48,10 @@ public class ArticleController {
 
     @GetMapping("/author/{authorId}")
     public ResponseEntity<?> findArticlesByAuthor(@PathVariable("authorId") Long authorId) {
-        //todo to do!
-        return null;
+        User author = userService.findUserById(authorId);
+
+        List<ArticleDto> articles = articleService.findAllArticlesByAuthor(author);
+        return new ResponseEntity<>(articles, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

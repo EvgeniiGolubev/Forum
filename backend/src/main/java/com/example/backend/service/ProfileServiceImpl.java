@@ -193,7 +193,7 @@ public class ProfileServiceImpl implements ProfileService {
             throw new IllegalArgumentException("New email cannot be null");
         }
 
-        if (user.getEmail().equals(newEmail.getEmail()) && passwordEncoder.matches(newEmail.getPassword(), user.getPassword())) {
+        if (!user.getEmail().equals(newEmail.getEmail()) && passwordEncoder.matches(newEmail.getPassword(), user.getPassword())) {
             user.setEmail(newEmail.getEmail());
             user.setActive(false);
             user.setActivationCode(UUID.randomUUID().toString());

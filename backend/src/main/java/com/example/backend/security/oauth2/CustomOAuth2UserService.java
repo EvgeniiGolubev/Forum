@@ -41,6 +41,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     email,
                     null,
                     oAuth2User.getAttribute("name"),
+                    null,
                     oAuth2User.getAttribute("picture"),
                     oAuth2User.getAttribute("locale"),
                     Provider.GOOGLE,
