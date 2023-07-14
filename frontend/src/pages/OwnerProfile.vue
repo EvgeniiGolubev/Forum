@@ -72,7 +72,7 @@
               </div>
             </div>
 
-            <div style="padding-left: 8px">
+            <div style="padding-left: 8px" v-if="showChangeForm">
               <div class="row">
                 <button type="button" style="width: 200px;" class="btn btn-outline-primary m-1"
                         data-bs-toggle="collapse"
@@ -102,7 +102,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row" v-if="showChangeForm">
                 <button type="button" style="width: 200px;" class="btn btn-outline-primary m-1"
                         data-bs-toggle="collapse"
                         data-bs-target="#collapseNewPassword" aria-expanded="false" aria-controls="collapseNewPassword">
@@ -162,12 +162,7 @@ export default {
     return {
       errors: [],
       profileId: -1,
-      profile: {
-        "id": 2,
-        "name": "Ivanka",
-        "description": "Я Иванка багуганка",
-        "userPicture": "b05fb0af-ef7f-4b76-8a37-5410be382b65.jpg"
-      },
+      profile: null,
       newName: '',
       newDescription: '',
       oldPassword: '',
@@ -176,6 +171,7 @@ export default {
       newEmail: '',
       showUploadButton: false,
       spinnerVisible: false,
+      showChangeForm: false,
     }
   },
   methods: {
@@ -332,6 +328,8 @@ export default {
         form.classList.add('was-validated');
       }, false);
     });
+
+    this.showChangeForm = this.$store.getters.getProvider === 'LOCAL'
 
     this.profileId = this.$store.getters.getId
     this.getProfileById()

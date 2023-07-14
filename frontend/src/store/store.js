@@ -6,6 +6,7 @@ const state = {
     name: localStorage.getItem('user-name') || '',
     picture: localStorage.getItem('user-picture') || '',
     id: localStorage.getItem('user-id') || null,
+    provider: localStorage.getItem('user-provider') || '',
 }
 
 const getters = {
@@ -26,19 +27,24 @@ const getters = {
     },
     getId: state => {
         return Number(state.id)
-    }
+    },
+    getProvider: state => {
+        return state.provider
+    },
 }
 
 const mutations = {
     loginMutation: (state, user) => {
-        localStorage.setItem("user-authenticate", user.authenticate)
-        localStorage.setItem("user-name", user.name)
-        localStorage.setItem("user-picture", user.picture)
-        localStorage.setItem("user-id", user.id)
+        localStorage.setItem('user-authenticate', user.authenticate)
+        localStorage.setItem('user-name', user.name)
+        localStorage.setItem('user-picture', user.picture)
+        localStorage.setItem('user-id', user.id)
+        localStorage.setItem('user-provider', user.provider)
         state.authenticate = user.authenticate
         state.name = user.name
         state.picture = user.picture
         state.id = user.id
+        state.provider = user.provider
 
         let isUser = false
         let isModerator = false
@@ -75,11 +81,13 @@ const mutations = {
         state.name =''
         state.picture = ''
         state.id = ''
-        localStorage.removeItem("user-authenticate")
-        localStorage.removeItem("user-role")
-        localStorage.removeItem("user-name")
-        localStorage.removeItem("user-picture")
-        localStorage.removeItem("user-id")
+        state.provider = ''
+        localStorage.removeItem('user-authenticate')
+        localStorage.removeItem('user-role')
+        localStorage.removeItem('user-name')
+        localStorage.removeItem('user-picture')
+        localStorage.removeItem('user-id')
+        localStorage.removeItem('user-provider')
     },
     changeNameMutation: (state, name) => {
         state.name = name

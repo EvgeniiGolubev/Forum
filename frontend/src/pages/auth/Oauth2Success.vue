@@ -25,7 +25,8 @@ export default {
               roles: response.data.roles,
               name: response.data.name,
               picture: response.data.userPicture,
-              id: response.data.id
+              id: response.data.id,
+              provider: response.data.provider
             })
 
             this.alertMessage = 'You successfully sign in'
