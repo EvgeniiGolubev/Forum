@@ -13,6 +13,9 @@ public interface ArticleService {
     Page<ArticleDto> findAllArticles(String stringSearch, String sortType, int page, int pageSize)
             throws IllegalArgumentException;
 
+    Page<ArticleDto> findArticlesBySubscription(String stringSearch, User user, String sortType, int page, int pageSize)
+            throws IllegalArgumentException;
+
     List<ArticleDto> findAllArticlesByAuthor(User author) throws IllegalArgumentException;
 
     ArticleDto findArticleById(Long id) throws IllegalArgumentException, ArticleNotFoundException;
@@ -27,7 +30,4 @@ public interface ArticleService {
             throws IllegalArgumentException, FileManagerException, ArticleNotFoundException;
 
     User getArticleAuthorByArticleId(Long id) throws IllegalArgumentException;
-
-    Page<ArticleDto> getArticlesBySubscription(User user, String sortType, int page, int pageSize)
-            throws IllegalArgumentException;
 }

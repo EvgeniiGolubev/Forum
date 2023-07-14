@@ -46,6 +46,27 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public Page<ArticleDto> findArticlesBySubscription(String stringSearch, User user, String sortType, int page, int pageSize)
+            throws IllegalArgumentException {
+
+        Pageable pageable = PageableUtil.validPaginationAndGetPageable(sortType, page, pageSize, "creationDate");
+
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
+        Page<Article> articles;
+
+        if (stringSearch != null && !stringSearch.isEmpty()) {
+            articles = articleRepository.findArticlesBySubscribedUserAndTitleContaining(user.getId(), stringSearch, pageable);
+        } else {
+            articles = articleRepository.findArticlesBySubscribedUser(user.getId(), pageable);
+        }
+
+        return articles.map(ArticleDto::new);
+    }
+
+    @Override
     public List<ArticleDto> findAllArticlesByAuthor(User author) throws IllegalArgumentException {
         if (author == null) {
             throw new IllegalArgumentException("Author cannot be null");
@@ -136,20 +157,6 @@ public class ArticleServiceImpl implements ArticleService {
         fileStoreService.deleteFiles(article.getImageLinks());
 
         articleRepository.delete(article);
-    }
-
-    @Override
-    public Page<ArticleDto> getArticlesBySubscription(User user, String sortType, int page, int pageSize)
-            throws IllegalArgumentException {
-
-        if (user == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        }
-
-        Pageable pageable = PageableUtil.validPaginationAndGetPageable(sortType, page, pageSize, "creationDate");
-        Page<Article> articles = articleRepository.findArticlesBySubscribedUserSortedByDate(user.getId(), pageable);
-
-        return articles.map(ArticleDto::new);
     }
 
     @Override

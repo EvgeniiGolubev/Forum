@@ -19,14 +19,13 @@
         <div class="col-md-8">
           <div class="card-body text-md-start">
             <div class="d-flex">
-              <p>Name:</p>
-              <h5 class="card-title me-3">{{ profile.name }}</h5>
+              <p class="card-text me-2"><strong>Name</strong></p>
             </div>
-
-            <div class="d-flex me-3">
-              <p>Description:</p>
-              <p class="card-text me-2 mt-3">{{ profile.description }}</p>
+            <h5 class="card-title">{{ profile.name }}</h5>
+            <div class="d-flex">
+              <p class="card-text me-2 mt-3"><strong>Description</strong></p>
             </div>
+            <p class="card-text">{{ profile.description }}</p>
           </div>
         </div>
       </div>

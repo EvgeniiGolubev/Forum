@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Set;
 
@@ -35,7 +34,7 @@ public class ArticleController {
     }
 
     @GetMapping
-    public ResponseEntity<?> findAllArticles(
+    public ResponseEntity<?> getAllArticles(
             @RequestParam("stringSearch") String stringSearch,
             @RequestParam("sortType") String sortType,
             @RequestParam("page") int page,
@@ -47,7 +46,7 @@ public class ArticleController {
     }
 
     @GetMapping("/author/{authorId}")
-    public ResponseEntity<?> findArticlesByAuthor(@PathVariable("authorId") Long authorId) {
+    public ResponseEntity<?> getArticlesByAuthor(@PathVariable("authorId") Long authorId) {
         User author = userService.findUserById(authorId);
 
         List<ArticleDto> articles = articleService.findAllArticlesByAuthor(author);
@@ -55,9 +54,23 @@ public class ArticleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findArticleById(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getArticleById(@PathVariable("id") Long id) {
         ArticleDto article = articleService.findArticleById(id);
         return new ResponseEntity<>(article, HttpStatus.OK);
+    }
+
+    @GetMapping("/activity-feed")
+    public ResponseEntity<?> getUserActivityFeed(
+            @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
+            @RequestParam("stringSearch") String stringSearch,
+            @RequestParam("sortType") String sortType,
+            @RequestParam("page") int page,
+            @RequestParam("pageSize") int pageSize
+    ) {
+        User user = userService.getUserFromUserDetails(authenticatedUser);
+
+        Page<ArticleDto> articles = articleService.findArticlesBySubscription(stringSearch, user, sortType, page, pageSize);
+        return new ResponseEntity<>(articles, HttpStatus.OK);
     }
 
     @PreAuthorize("hasAuthority('USER')")

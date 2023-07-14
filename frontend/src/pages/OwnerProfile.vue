@@ -49,7 +49,7 @@
               </div>
             </div>
 
-            <div class="d-flex align-items-center">
+            <div class="d-flex">
               <p class="card-text me-2 mt-3"><strong>Description</strong></p>
               <a data-bs-toggle="collapse" href="#collapseNewDescription" role="button" aria-expanded="false"
                  aria-controls="collapseNewDescription">
