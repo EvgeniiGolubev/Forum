@@ -2,12 +2,22 @@
   <div class="container">
     <div class="card my-3 p-3 bg-body rounded shadow-sm">
       <h5 class="border-bottom pb-2 mb-0 text-md-start">Comments</h5>
-      <div class="d-flex text-body-secondary pt-3" v-for="comment in comments" :key="comment.id">
-        <img :src="getImagePath(comment.author.userPicture)" class="bd-placeholder-img flex-shrink-0 me-2 rounded" style="width: 50px; height: 50px;">
-        <p class="pb-3 mb-0 lh-sm border-bottom text-md-start">
-          <strong class="d-block text-gray-dark">{{ comment.author.name }}</strong>
-          {{ comment.content }}
-        </p>
+      <div class="d-flex justify-content-between align-items-center pt-3" v-for="comment in comments" :key="comment.id">
+        <div class="d-flex">
+          <img :src="getImagePath(comment.author.userPicture)" class="bd-placeholder-img flex-shrink-0 me-2 rounded" style="width: 50px; height: 50px;">
+          <div class="pb-3 mb-0 lh-sm text-md-start">
+            <strong class="d-block text-gray-dark">{{ comment.author.name }}</strong>
+            <div class="comment-content">
+              {{ comment.content }}
+            </div>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-danger" @click.prevent="deleteComment(comment.id)" style="height: 35px;"
+                  v-if="commentOwnerId === comment.author.id">
+            X
+          </button>
+        </div>
       </div>
       <div class="d-flex text-body-secondary pt-3" v-if="articleId">
         <textarea class="form-control" rows="2" v-model="newComment" maxlength="600"></textarea>
@@ -27,14 +37,23 @@ export default {
   data() {
     return {
       newComment: '',
+      commentOwnerId: null,
     }
   },
   methods: {
     submitComment(articleId) {
-      AXIOS.post(`/comments/${articleId}`, {newComment: this.newComment})
+      AXIOS.post(`/comments/article/${articleId}`, { content: this.newComment })
           .then(response => {
             this.$emit('newComment', response.data);
           })
+          .catch(error => {
+            this.handleError(error)
+          })
+
+      this.newComment = ''
+    },
+    deleteComment(commentId) {
+      AXIOS.delete(`/comments/${commentId}`)
           .catch(error => {
             this.handleError(error)
           })
@@ -60,10 +79,17 @@ export default {
         }
       }
     },
+  },
+  mounted() {
+    this.commentOwnerId = this.$store.getters.getId
   }
 }
 </script>
 
 <style scoped>
-
+.comment-content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-line;
+}
 </style>

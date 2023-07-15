@@ -1,7 +1,7 @@
 package com.example.backend.security;
 
-import com.example.backend.model.entity.user.Role;
-import com.example.backend.model.entity.user.Status;
+import com.example.backend.model.entity.user.enums.Role;
+import com.example.backend.model.entity.user.enums.Status;
 import com.example.backend.model.entity.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

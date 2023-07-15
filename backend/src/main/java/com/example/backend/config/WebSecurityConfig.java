@@ -1,6 +1,6 @@
 package com.example.backend.config;
 
-import com.example.backend.model.entity.user.Role;
+import com.example.backend.model.entity.user.enums.Role;
 import com.example.backend.security.jwt.JwtTokenFilter;
 import com.example.backend.security.jwt.JwtUtils;
 import com.example.backend.security.oauth2.CustomOAuth2UserService;

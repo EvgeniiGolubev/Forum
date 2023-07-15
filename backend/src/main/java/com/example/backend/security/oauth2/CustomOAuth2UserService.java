@@ -1,8 +1,8 @@
 package com.example.backend.security.oauth2;
 
-import com.example.backend.model.entity.user.Provider;
-import com.example.backend.model.entity.user.Role;
-import com.example.backend.model.entity.user.Status;
+import com.example.backend.model.entity.user.enums.Provider;
+import com.example.backend.model.entity.user.enums.Role;
+import com.example.backend.model.entity.user.enums.Status;
 import com.example.backend.model.entity.user.User;
 import com.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.example.backend.model.dto.user;
 
-import com.example.backend.model.entity.user.Role;
+import com.example.backend.model.entity.user.enums.Role;
 import com.example.backend.model.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

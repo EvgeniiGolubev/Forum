@@ -45,6 +45,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<?> handleCommentNotFoundException(CommentNotFoundException e) {
+        return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(FileManagerException.class)
     public ResponseEntity<?> handleFileManagerException(FileManagerException e) {
         log.error("Error in the file system. Message: " + e.getMessage());

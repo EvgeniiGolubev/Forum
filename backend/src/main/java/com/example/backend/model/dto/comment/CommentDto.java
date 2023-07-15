@@ -1,6 +1,8 @@
 package com.example.backend.model.dto.comment;
 
+import com.example.backend.model.dto.article.ArticleDto;
 import com.example.backend.model.dto.profile.UserProfileDto;
+import com.example.backend.model.entity.comment.Comment;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -21,13 +23,17 @@ public class CommentDto implements Serializable {
     @JsonProperty("author")
     private UserProfileDto author;
 
+    @JsonProperty("article")
+    private ArticleDto article;
+
     public CommentDto() {}
 
-//    public CommentDto(Comment comment) {
-//        this.id = comment.getId();
-//        this.content = comment.getContent();
-//        this.author = new UserProfileDto(comment.getAuthor());
-//    }
+    public CommentDto(Comment comment) {
+        this.id = comment.getId();
+        this.content = comment.getContent();
+        this.author = new UserProfileDto(comment.getAuthor());
+        this.article = new ArticleDto(comment.getArticle());
+    }
 
 
     @Override

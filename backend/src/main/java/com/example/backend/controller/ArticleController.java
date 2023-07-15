@@ -1,7 +1,8 @@
 package com.example.backend.controller;
 
 import com.example.backend.model.dto.article.ArticleDto;
-import com.example.backend.model.entity.user.Role;
+import com.example.backend.model.entity.article.Article;
+import com.example.backend.model.entity.user.enums.Role;
 import com.example.backend.model.entity.user.User;
 import com.example.backend.security.UserDetailsImpl;
 import com.example.backend.service.ArticleService;
@@ -55,8 +56,11 @@ public class ArticleController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getArticleById(@PathVariable("id") Long id) {
-        ArticleDto article = articleService.findArticleById(id);
-        return new ResponseEntity<>(article, HttpStatus.OK);
+        Article article = articleService.findArticleById(id);
+
+        //todo подумать над мапером для сущностей и дто
+        ArticleDto articleDto = new ArticleDto(article);
+        return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
     @GetMapping("/activity-feed")

@@ -78,10 +78,8 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public ArticleDto findArticleById(Long id) throws IllegalArgumentException, ArticleNotFoundException {
-        Article article = checkArticlePresentAndGet(id);
-
-        return new ArticleDto(article);
+    public Article findArticleById(Long id) throws IllegalArgumentException, ArticleNotFoundException {
+        return checkArticlePresentAndGet(id);
     }
 
     @Override

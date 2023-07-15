@@ -50,7 +50,7 @@
             </div>
 
             <div class="d-flex">
-              <p class="card-text me-2 mt-3"><strong>Description</strong></p>
+              <p class="card-text me-2"><strong>Description</strong></p>
               <a data-bs-toggle="collapse" href="#collapseNewDescription" role="button" aria-expanded="false"
                  aria-controls="collapseNewDescription">
                 <font-awesome-icon :icon="['fas', 'pen']" style="color: #3e6cf4; margin: 0"/>

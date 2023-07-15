@@ -1,6 +1,9 @@
 package com.example.backend.model.entity.user;
 
 import com.example.backend.model.entity.article.Article;
+import com.example.backend.model.entity.user.enums.Provider;
+import com.example.backend.model.entity.user.enums.Role;
+import com.example.backend.model.entity.user.enums.Status;
 import lombok.Data;
 
 import javax.persistence.*;

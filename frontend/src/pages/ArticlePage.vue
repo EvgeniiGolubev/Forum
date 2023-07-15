@@ -136,8 +136,7 @@ export default {
       this.visibleForm = !this.visibleForm
     },
     newCommentAdded(comment) {
-      let index = this.comments.findIndex(item => item.id === comment.id)
-      this.comments.splice(index, 1, comment);
+      this.comments.push(comment)
     },
     getImagePath(link) {
       if (link && typeof link === 'string') {
