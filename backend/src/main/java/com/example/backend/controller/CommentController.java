@@ -86,7 +86,7 @@ public class CommentController {
         User author = userService.getUserFromUserDetails(authorisedUser);
         Comment comment = commentService.findCommentById(commentId);
 
-        if (author == comment.getAuthor()) {
+        if (author != comment.getAuthor()) {
             throw new AccessDeniedException("Access denied. Only the author can delete the comment");
         }
 

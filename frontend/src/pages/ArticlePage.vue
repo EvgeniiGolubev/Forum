@@ -54,7 +54,8 @@
     </div>
   </main>
 
-  <comments-list v-bind:comments="comments" v-bind:article-id="article.id" @new-comment="newCommentAdded" v-if="commentsOpen"/>
+  <comments-list v-bind:comments="comments" v-bind:article-id="article.id" @comment-added="newCommentAdded"
+                 @comment-deleted="commentDeleted" v-if="commentsOpen"/>
 
 </template>
 
@@ -137,6 +138,12 @@ export default {
     },
     newCommentAdded(comment) {
       this.comments.push(comment)
+    },
+    commentDeleted(commentId) {
+      const index = this.comments.findIndex(comment => comment.id === commentId);
+      if (index !== -1) {
+        this.comments.splice(index, 1);
+      }
     },
     getImagePath(link) {
       if (link && typeof link === 'string') {

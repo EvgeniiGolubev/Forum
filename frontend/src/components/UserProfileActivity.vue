@@ -30,7 +30,7 @@
     </div>
 
     <div class="card-body" v-if="visibleSections.comments">
-      <comments-list v-bind:comments="comments"/>
+      <comments-list v-bind:comments="comments" @comment-deleted="commentDeleted"/>
     </div>
 
     <div class="card-body" v-if="visibleSections.subscribers">
@@ -115,6 +115,12 @@ export default {
           .catch(error => {
             this.$emit('errors', error);
           })
+    },
+    commentDeleted(commentId) {
+      const index = this.comments.findIndex(comment => comment.id === commentId);
+      if (index !== -1) {
+        this.comments.splice(index, 1);
+      }
     },
   },
   mounted() {

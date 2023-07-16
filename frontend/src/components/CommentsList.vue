@@ -33,7 +33,7 @@ import {AXIOS} from "@/http-commons";
 
 export default {
   props: ['comments', 'articleId'],
-  emits: ['newComment'],
+  emits: ['commentAdded', 'commentDeleted'],
   data() {
     return {
       newComment: '',
@@ -44,7 +44,7 @@ export default {
     submitComment(articleId) {
       AXIOS.post(`/comments/article/${articleId}`, { content: this.newComment })
           .then(response => {
-            this.$emit('newComment', response.data);
+            this.$emit('commentAdded', response.data);
           })
           .catch(error => {
             this.handleError(error)
@@ -54,6 +54,10 @@ export default {
     },
     deleteComment(commentId) {
       AXIOS.delete(`/comments/${commentId}`)
+          .then(response => {
+            console.log(response)
+            this.$emit('commentDeleted', commentId);
+          })
           .catch(error => {
             this.handleError(error)
           })
