@@ -46,7 +46,7 @@
           <div class="w-100" v-on:click="likeArticle(article.id)">
             <font-awesome-icon :icon="['fas', 'heart']" size="2xl" style="color: #3e6cf4;" class="heart" v-if="articleLiked"/>
             <font-awesome-icon :icon="['far', 'heart']" size="2xl" style="color: #3e6cf4;" class="heart" v-else/>
-            <span>{{ articleLikes }}</span>
+            <span>{{ article.likes }}</span>
           </div>
           <small class="text-body-secondary">{{ formatDateTime(article.creationDate) }}</small>
         </div>
@@ -83,7 +83,6 @@ export default {
       articleLiked: false,
       commentsOpen: false,
       isAuthor: false,
-      articleLikes: 24,
       articleId: 0,
     }
   },
@@ -110,15 +109,18 @@ export default {
       this.commentsOpen = !this.commentsOpen
     },
     likeArticle(articleId) {
-      console.log(articleId)
-
       if (this.articleLiked) {
         this.articleLiked = false
-        this.articleLikes--
+        this.article.likes--
       } else {
         this.articleLiked = true
-        this.articleLikes++
+        this.article.likes++
       }
+
+      AXIOS.post(`articles/like/${articleId}`, {}, {params: {liked: this.articleLiked}})
+          .catch(error => {
+            this.handleError(error)
+          })
     },
     openAuthorProfile(authorId) {
       this.$router.push({name: 'UserProfile', params: {id: authorId}});

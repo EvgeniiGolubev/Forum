@@ -16,8 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -31,22 +29,18 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Page<ArticleDto> findAllArticles(String stringSearch, String sortType, int page, int pageSize) throws IllegalArgumentException {
+    public Page<Article> findAllArticles(String stringSearch, String sortType, int page, int pageSize) throws IllegalArgumentException {
         Pageable pageable = PageableUtil.validPaginationAndGetPageable(sortType, page, pageSize, "creationDate");
 
-        Page<Article> articles;
-
         if (stringSearch != null && !stringSearch.isEmpty()) {
-            articles = articleRepository.findByTitleContaining(stringSearch, pageable);
+            return articleRepository.findByTitleContaining(stringSearch, pageable);
         } else {
-            articles = articleRepository.findAll(pageable);
+            return articleRepository.findAll(pageable);
         }
-
-        return articles.map(ArticleDto::new);
     }
 
     @Override
-    public Page<ArticleDto> findArticlesBySubscription(String stringSearch, User user, String sortType, int page, int pageSize)
+    public Page<Article> findArticlesBySubscription(String stringSearch, User user, String sortType, int page, int pageSize)
             throws IllegalArgumentException {
 
         Pageable pageable = PageableUtil.validPaginationAndGetPageable(sortType, page, pageSize, "creationDate");
@@ -55,26 +49,20 @@ public class ArticleServiceImpl implements ArticleService {
             throw new IllegalArgumentException("User cannot be null");
         }
 
-        Page<Article> articles;
-
         if (stringSearch != null && !stringSearch.isEmpty()) {
-            articles = articleRepository.findArticlesBySubscribedUserAndTitleContaining(user.getId(), stringSearch, pageable);
+            return articleRepository.findArticlesBySubscribedUserAndTitleContaining(user.getId(), stringSearch, pageable);
         } else {
-            articles = articleRepository.findArticlesBySubscribedUser(user.getId(), pageable);
+            return articleRepository.findArticlesBySubscribedUser(user.getId(), pageable);
         }
-
-        return articles.map(ArticleDto::new);
     }
 
     @Override
-    public List<ArticleDto> findAllArticlesByAuthor(User author) throws IllegalArgumentException {
+    public List<Article> findAllArticlesByAuthor(User author) throws IllegalArgumentException {
         if (author == null) {
             throw new IllegalArgumentException("Author cannot be null");
         }
 
-        List<Article> articles = articleRepository.findAllByAuthor(author);
-
-        return articles.stream().map(ArticleDto::new).collect(Collectors.toList());
+        return articleRepository.findAllByAuthor(author);
     }
 
     @Override
@@ -83,7 +71,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public ArticleDto createArticle(User author, ArticleDto articleDto, List<MultipartFile> images)
+    public Article createArticle(User author, ArticleDto articleDto, List<MultipartFile> images)
             throws IllegalArgumentException, FileManagerException {
 
         if (author == null) {
@@ -107,11 +95,11 @@ public class ArticleServiceImpl implements ArticleService {
             newArticle.getImageLinks().addAll(imageLinks);
         }
 
-        return new ArticleDto(articleRepository.save(newArticle));
+        return articleRepository.save(newArticle);
     }
 
     @Override
-    public ArticleDto updateArticle(Long id, User author, ArticleDto articleDto, List<MultipartFile> images)
+    public Article updateArticle(Long id, User author, ArticleDto articleDto, List<MultipartFile> images)
             throws IllegalArgumentException, FileManagerException, ArticleNotFoundException {
 
         if (author == null) {
@@ -143,7 +131,7 @@ public class ArticleServiceImpl implements ArticleService {
         article.setTitle(articleDto.getTitle());
         article.setContent(articleDto.getContent());
 
-        return new ArticleDto(articleRepository.save(article));
+        return articleRepository.save(article);
     }
 
     @Override
@@ -161,6 +149,23 @@ public class ArticleServiceImpl implements ArticleService {
     public User getArticleAuthorByArticleId(Long id) throws IllegalArgumentException {
         Article article = checkArticlePresentAndGet(id);
         return article.getAuthor();
+    }
+
+    @Override
+    public void changeArticleLikeStatus(Long id, Boolean liked, User authenticatedUser) throws IllegalArgumentException {
+        if (liked == null) {
+            throw new IllegalArgumentException("Like status cannot be null");
+        }
+
+        Article article = checkArticlePresentAndGet(id);
+
+        if (liked) {
+            article.getLikes().add(authenticatedUser);
+        } else {
+            article.getLikes().remove(authenticatedUser);
+        }
+
+        articleRepository.save(article);
     }
 
     private Article checkArticlePresentAndGet(Long id) throws ArticleNotFoundException, IllegalArgumentException {

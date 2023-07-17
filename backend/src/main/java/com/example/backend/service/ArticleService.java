@@ -11,24 +11,26 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ArticleService {
-    Page<ArticleDto> findAllArticles(String stringSearch, String sortType, int page, int pageSize)
+    Page<Article> findAllArticles(String stringSearch, String sortType, int page, int pageSize)
             throws IllegalArgumentException;
 
-    Page<ArticleDto> findArticlesBySubscription(String stringSearch, User user, String sortType, int page, int pageSize)
+    Page<Article> findArticlesBySubscription(String stringSearch, User user, String sortType, int page, int pageSize)
             throws IllegalArgumentException;
 
-    List<ArticleDto> findAllArticlesByAuthor(User author) throws IllegalArgumentException;
+    List<Article> findAllArticlesByAuthor(User author) throws IllegalArgumentException;
 
     Article findArticleById(Long id) throws IllegalArgumentException, ArticleNotFoundException;
 
-    ArticleDto createArticle(User author, ArticleDto articleDto, List<MultipartFile> images)
+    Article createArticle(User author, ArticleDto articleDto, List<MultipartFile> images)
             throws IllegalArgumentException, FileManagerException;
 
-    ArticleDto updateArticle(Long id, User author, ArticleDto articleDto, List<MultipartFile> images)
+    Article updateArticle(Long id, User author, ArticleDto articleDto, List<MultipartFile> images)
             throws IllegalArgumentException, FileManagerException, ArticleNotFoundException;
 
     void deleteArticle(Long id, User author)
             throws IllegalArgumentException, FileManagerException, ArticleNotFoundException;
 
     User getArticleAuthorByArticleId(Long id) throws IllegalArgumentException;
+
+    void changeArticleLikeStatus(Long id, Boolean liked, User authenticatedUser) throws IllegalArgumentException;
 }

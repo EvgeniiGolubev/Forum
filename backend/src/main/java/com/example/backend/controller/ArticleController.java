@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.mapper.ArticleMapper;
 import com.example.backend.model.dto.article.ArticleDto;
 import com.example.backend.model.entity.article.Article;
 import com.example.backend.model.entity.user.enums.Role;
@@ -27,42 +28,71 @@ import java.util.Set;
 public class ArticleController {
     private final ArticleService articleService;
     private final UserService userService;
+    private final ArticleMapper articleMapper;
 
     @Autowired
-    public ArticleController(ArticleService articleService, UserService userService) {
+    public ArticleController(ArticleService articleService, UserService userService, ArticleMapper articleMapper) {
         this.articleService = articleService;
         this.userService = userService;
+        this.articleMapper = articleMapper;
     }
 
     @GetMapping
     public ResponseEntity<?> getAllArticles(
+            @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
             @RequestParam("stringSearch") String stringSearch,
             @RequestParam("sortType") String sortType,
             @RequestParam("page") int page,
             @RequestParam("pageSize") int pageSize
     ) {
-        Page<ArticleDto> articles = articleService.findAllArticles(stringSearch, sortType, page, pageSize);
+        User user = null;
 
-        return new ResponseEntity<>(articles, HttpStatus.OK);
+        if (authenticatedUser != null) {
+            user = userService.getUserFromUserDetails(authenticatedUser);
+        }
+
+        Page<Article> articles = articleService.findAllArticles(stringSearch, sortType, page, pageSize);
+
+        Page<ArticleDto> articleDtos = articleMapper.toArticleDtoPage(articles, user);
+        return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
     @GetMapping("/author/{authorId}")
-    public ResponseEntity<?> getArticlesByAuthor(@PathVariable("authorId") Long authorId) {
+    public ResponseEntity<?> getArticlesByAuthor(
+            @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
+            @PathVariable("authorId") Long authorId
+    ) {
         User author = userService.findUserById(authorId);
+        User user = null;
 
-        List<ArticleDto> articles = articleService.findAllArticlesByAuthor(author);
-        return new ResponseEntity<>(articles, HttpStatus.OK);
+        if (authenticatedUser != null) {
+            user = userService.getUserFromUserDetails(authenticatedUser);
+        }
+
+        List<Article> articles = articleService.findAllArticlesByAuthor(author);
+
+        List<ArticleDto> articleDtos = articleMapper.toArticleDtoList(articles, user);
+        return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getArticleById(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getArticleById(
+            @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
+            @PathVariable("id") Long id
+    ) {
+        User user = null;
+
+        if (authenticatedUser != null) {
+            user = userService.getUserFromUserDetails(authenticatedUser);
+        }
+
         Article article = articleService.findArticleById(id);
 
-        //todo подумать над мапером для сущностей и дто
-        ArticleDto articleDto = new ArticleDto(article);
+        ArticleDto articleDto = articleMapper.toArticleDto(article, user);
         return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('USER')")
     @GetMapping("/activity-feed")
     public ResponseEntity<?> getUserActivityFeed(
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
@@ -73,21 +103,25 @@ public class ArticleController {
     ) {
         User user = userService.getUserFromUserDetails(authenticatedUser);
 
-        Page<ArticleDto> articles = articleService.findArticlesBySubscription(stringSearch, user, sortType, page, pageSize);
-        return new ResponseEntity<>(articles, HttpStatus.OK);
+        Page<Article> articles = articleService.findArticlesBySubscription(stringSearch, user, sortType, page, pageSize);
+
+        Page<ArticleDto> articleDtos = articleMapper.toArticleDtoPage(articles, user);
+        return new ResponseEntity<>(articleDtos, HttpStatus.OK);
     }
 
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> createArticle(
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
-            @Valid @ModelAttribute ArticleDto articleDto,
+            @Valid @ModelAttribute ArticleDto newArticleDto,
             @RequestPart(name = "newImages", required = false) List<MultipartFile> images
     ) {
         User author = userService.getUserFromUserDetails(authenticatedUser);
 
-        ArticleDto article = articleService.createArticle(author, articleDto, images);
-        return new ResponseEntity<>(article, HttpStatus.CREATED);
+        Article article = articleService.createArticle(author, newArticleDto, images);
+
+        ArticleDto articleDto = articleMapper.toArticleDto(article, author);
+        return new ResponseEntity<>(articleDto, HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasAuthority('USER')")
@@ -95,7 +129,7 @@ public class ArticleController {
     public ResponseEntity<?> updateArticle(
             @PathVariable("id") Long id,
             @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
-            @Valid @ModelAttribute ArticleDto articleDto,
+            @Valid @ModelAttribute ArticleDto updatedArticleDto,
             @RequestPart(name = "newImages", required = false) List<MultipartFile> images
     ) {
         User actualAuthor = articleService.getArticleAuthorByArticleId(id);
@@ -103,8 +137,10 @@ public class ArticleController {
 
         checkAccess(actualAuthor, author);
 
-        ArticleDto article = articleService.updateArticle(id, author, articleDto, images);
-        return new ResponseEntity<>(article, HttpStatus.OK);
+        Article article = articleService.updateArticle(id, author, updatedArticleDto, images);
+
+        ArticleDto articleDto = articleMapper.toArticleDto(article, author);
+        return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
     @PreAuthorize("hasAuthority('USER')")
@@ -119,6 +155,19 @@ public class ArticleController {
         checkAccess(actualAuthor, author);
 
         articleService.deleteArticle(id, author);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @PostMapping("/like/{id}")
+    public ResponseEntity<?> changeLikeStatus(
+            @AuthenticationPrincipal UserDetailsImpl authenticatedUser,
+            @PathVariable("id") Long id,
+            @RequestParam("liked") Boolean liked
+    ) {
+        User user =  userService.getUserFromUserDetails(authenticatedUser);
+
+        articleService.changeArticleLikeStatus(id, liked, user);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

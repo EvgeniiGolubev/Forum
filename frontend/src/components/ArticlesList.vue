@@ -21,7 +21,7 @@
                          class="btn btn-outline-primary"/>
                   <div>
                     <font-awesome-icon :icon="['fas', 'heart']" size="2xl" style="color: #3e6cf4;" class="heart"/>
-                    <span>24</span>
+                    <span>{{ article.likes }}</span>
                   </div>
                 </div>
                 <small class="text-body-secondary">{{ formatDateTime(article.creationDate) }}</small>

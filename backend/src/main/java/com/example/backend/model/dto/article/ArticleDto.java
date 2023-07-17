@@ -37,6 +37,12 @@ public class ArticleDto implements Serializable {
     @JsonProperty("imageLinks")
     private List<String> imageLinks;
 
+    @JsonProperty("likes")
+    private Integer likes;
+
+    @JsonProperty("isLiked")
+    private Boolean isLiked;
+
     public ArticleDto() {}
 
     public ArticleDto(Article article) {
@@ -46,6 +52,7 @@ public class ArticleDto implements Serializable {
         this.author = new UserProfileDto(article.getAuthor());
         this.creationDate = article.getCreationDate();
         this.imageLinks = article.getImageLinks();
+        this.isLiked = false;
     }
 
     @Override
