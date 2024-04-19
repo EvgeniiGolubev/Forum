@@ -1,5 +1,5 @@
 # Forum
-This is a RESTful application built to provide user authentication and authorization using JWT tokens. The application supports various authentication methods, including email/password and Google account authentication. User registration requires email confirmation for added security. Once authenticated, users can perform actions such as creating and publishing articles, liking and commenting on articles, and subscribing to other users to receive activity feeds based on their subscriptions.
+"Forum" is a RESTful application. The application implements the ability to authenticate and authorize users using JWT tokens. The app supports various authentication methods including email/password authentication and Google account authentication. User registration requires email confirmation for added security. Once authenticated, users can perform actions such as creating and publishing articles, liking and commenting on articles, and following other users to receive activity feeds based on their subscriptions.
 
 ## Features
 
